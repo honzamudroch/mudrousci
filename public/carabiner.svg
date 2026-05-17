@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none">
+  <!-- Tělo karabiny — D-tvar -->
+  <path d="M30 15 C10 15 8 40 8 50 C8 65 12 85 30 88 L60 88 C62 88 64 86 64 84 L64 16 C64 14 62 12 60 12 L30 15Z"
+    stroke="#1a1a1a" stroke-width="6" fill="white" stroke-linejoin="round"/>
+  <!-- Vnější obrys (silnější) -->
+  <path d="M30 15 C10 15 8 40 8 50 C8 65 12 85 30 88 L60 88 C62 88 64 86 64 84 L64 16 C64 14 62 12 60 12 L30 15Z"
+    stroke="#1a1a1a" stroke-width="3" fill="none"/>
+  <!-- Pojistka (gate) -->
+  <line x1="64" y1="22" x2="78" y2="28" stroke="#1a1a1a" stroke-width="6" stroke-linecap="round"/>
+  <line x1="78" y1="28" x2="78" y2="72" stroke="#1a1a1a" stroke-width="6" stroke-linecap="round"/>
+  <line x1="78" y1="72" x2="64" y2="78" stroke="#1a1a1a" stroke-width="6" stroke-linecap="round"/>
+  <!-- Zámek pojistky -->
+  <circle cx="74" cy="50" r="4" fill="#1a1a1a"/>
+</svg>

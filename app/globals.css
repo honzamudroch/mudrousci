@@ -1,26 +1,111 @@
+@import url('https://fonts.googleapis.com/css2?family=Caveat:wght@400;500;600;700&family=Patrick+Hand&family=Shadows+Into+Light&family=Nunito:wght@400;500;600;700&display=swap');
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@theme {
+  --color-background: hsl(40 35% 95%);
+  --color-foreground: hsl(25 30% 15%);
+  --color-paper: hsl(38 40% 92%);
+  --color-paper-dark: hsl(35 30% 86%);
+  --color-accent: hsl(145 25% 30%);
+  --color-muted: hsl(25 15% 40%);
+  --color-border: hsl(30 25% 70%);
+  --color-terracotta: hsl(14 55% 50%);
+  --color-heart: hsl(0 60% 55%);
+
+  --font-hand: 'Caveat', cursive;
+  --font-notes: 'Patrick Hand', cursive;
+  --font-script: 'Shadows Into Light', cursive;
+  --font-body: 'Nunito', sans-serif;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+* {
+  box-sizing: border-box;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: 'Nunito', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: #ffffff;
+  color: hsl(25 30% 15%);
 }
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Caveat', cursive;
+  font-weight: 600;
+  color: hsl(25 30% 15%);
+}
+
+/* Paper card */
+.paper-card {
+  background: #ffffff;
+  box-shadow:
+    0 1px 0 hsl(25 30% 15% / 0.05),
+    0 8px 24px -12px hsl(25 30% 15% / 0.2);
+}
+
+/* Polaroid */
+.polaroid {
+  background: #ffffff;
+  padding: 12px 12px 48px 12px;
+  box-shadow:
+    0 1px 2px hsl(25 30% 15% / 0.1),
+    0 12px 28px -10px hsl(25 30% 15% / 0.3);
+}
+
+/* Ink underline */
+.ink-underline {
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 8'><path d='M2 5 Q 50 1, 100 4 T 198 3' stroke='%23231b13' stroke-width='1.5' fill='none' stroke-linecap='round'/></svg>");
+  background-repeat: no-repeat;
+  background-position: 0 100%;
+  background-size: 100% 8px;
+  padding-bottom: 8px;
+}
+
+/* Font helpers */
+.font-hand { font-family: 'Caveat', cursive; }
+.font-notes { font-family: 'Patrick Hand', cursive; }
+.font-script { font-family: 'Shadows Into Light', cursive; }
+.font-body { font-family: 'Nunito', sans-serif; }
+
+/* Hover pointer helper */
+.hover-lift {
+  cursor: pointer;
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+.hover-lift:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 32px -8px hsl(25 30% 15% / 0.22);
+}
+
+/* Map markers */
+.custom-marker {
+  cursor: pointer;
+  transition: transform 0.15s ease, filter 0.15s ease;
+}
+.custom-marker:hover {
+  transform: scale(1.15) translateY(-2px);
+  filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3));
+}
+
+/* Map canvas — crosshair při klikání */
+.mapboxgl-canvas {
+  cursor: crosshair !important;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: hsl(38 40% 92%); }
+::-webkit-scrollbar-thumb { background: hsl(30 25% 70%); border-radius: 3px; }
+
+/* Mapbox popup */
+.marker-popup .mapboxgl-popup-content {
+  padding: 5px 12px;
+  border-radius: 20px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  background: hsl(42 45% 97%);
+  border: 1px solid hsl(30 25% 70%);
+  font-family: 'Patrick Hand', cursive;
+  color: hsl(25 30% 15%);
+}
+.marker-popup .mapboxgl-popup-tip { display: none; }
