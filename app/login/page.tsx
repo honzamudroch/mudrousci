@@ -34,10 +34,10 @@ export default function LoginPage() {
         style={{left: '60%', top: '35px', width: '144px', transform: 'rotate(-3deg)', zIndex: 5}} />
       <img src="/02_paddleboard_woman_transparent.png" alt="" aria-hidden
         className="pointer-events-none select-none absolute opacity-80"
-        style={{left: '35%', top: '95px', width: '110px', transform: 'translateX(-50%) rotate(6deg)', zIndex: 5}} />
+        style={{left: '35%', top: '60px', width: '110px', transform: 'translateX(-50%) rotate(6deg)', zIndex: 5}} />
       <img src="/11_van_scene_transparent.png" alt="" aria-hidden
         className="pointer-events-none select-none absolute opacity-80"
-        style={{left: '44%', bottom: '110px', width: '130px', transform: 'translateX(-50%) rotate(3deg)', zIndex: 5}} />
+        style={{left: '44%', bottom: '60px', width: '130px', transform: 'translateX(-50%) rotate(3deg)', zIndex: 5}} />
 
       {/* Viditelné pouze na větších obrazovkách */}
       <img src="/03_via_ferrata_transparent.png" alt="" aria-hidden
