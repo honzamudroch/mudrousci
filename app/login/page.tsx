@@ -31,7 +31,7 @@ export default function LoginPage() {
       {/* Viditelné na všech velikostech */}
       <img src="/01_paragliding_transparent.png" alt="" aria-hidden
         className="pointer-events-none select-none absolute opacity-80"
-        style={{left: '63%', top: '-10px', width: '208px', transform: 'rotate(-3deg)', zIndex: 5}} />
+        style={{left: '63%', top: '-30px', width: '208px', transform: 'rotate(-3deg)', zIndex: 5}} />
       <img src="/02_paddleboard_woman_transparent.png" alt="" aria-hidden
         className="pointer-events-none select-none absolute opacity-80"
         style={{left: '28%', top: '60px', width: '110px', transform: 'translateX(-50%) rotate(6deg)', zIndex: 5}} />
