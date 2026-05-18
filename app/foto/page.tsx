@@ -18,7 +18,6 @@ const formatDateLabel = (d: string) =>
 export default function FotoPage() {
   const [groups, setGroups] = useState<PhotoGroup[]>([])
   const [loading, setLoading] = useState(true)
-  // lightbox: [groupIdx, photoIdx]
   const [lightbox, setLightbox] = useState<[number, number] | null>(null)
   const supabase = createClient()
 
@@ -81,14 +80,14 @@ export default function FotoPage() {
           </div>
         )}
 
-        <div className="space-y-6">
+        <div className="space-y-4">
           {groups.map((group, gi) => (
             <section key={gi}>
 
               {/* Datum + název */}
-              <div className="flex items-baseline gap-3 mb-2 pb-2"
+              <div className="flex items-baseline gap-3 mb-1 pb-1"
                 style={{ borderBottom: '1px solid hsl(25 30% 15% / 0.12)' }}>
-                <span className="font-hand" style={{ fontSize: '1.25rem', color: 'hsl(25 30% 15%)' }}>
+                <span className="font-hand" style={{ fontSize: '1.2rem', color: 'hsl(25 30% 15%)' }}>
                   {formatDateLabel(group.date)}
                 </span>
                 <span className="font-notes text-sm" style={{ color: 'hsl(25 15% 50%)' }}>
@@ -96,20 +95,12 @@ export default function FotoPage() {
                 </span>
               </div>
 
-              {/* Grid — počet sloupců přesně odpovídá počtu fotek (max 5)
-                  → vždy zaplní celou šířku, žádné prázdné buňky */}
-              <div
-                className="grid"
-                style={{
-                  gap: '2px',
-                  gridTemplateColumns: `repeat(${Math.min(group.photos.length, 5)}, 1fr)`,
-                }}
-              >
+              {/* Fotky — jeden řádek, stejná výška, zaplní šířku */}
+              <div className="flex" style={{ gap: '2px', height: '200px' }}>
                 {group.photos.map((url, pi) => (
                   <div
                     key={pi}
-                    className="cursor-pointer overflow-hidden"
-                    style={{ height: '220px' }}
+                    className="cursor-pointer overflow-hidden flex-1"
                     onClick={() => setLightbox([gi, pi])}
                   >
                     <img
