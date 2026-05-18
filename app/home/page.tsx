@@ -8,12 +8,12 @@ const Tile = ({ onClick, title, subtitle, rotate, image, imageAlt, imageClass }:
   image: string, imageAlt: string, imageClass?: string
 }) => (
   <button onClick={onClick}
-    className="paper-card border text-left block w-full p-8 md:p-10 hover:-translate-y-1 transition-transform"
+    className="paper-card border text-left block w-full p-5 md:p-10 hover:-translate-y-1 transition-transform"
     style={{borderColor: '#e0e0e0', transform: `rotate(${rotate}deg)`}}>
-    <h2 className="font-hand" style={{fontSize: '2.5rem', color: 'hsl(25 30% 15%)'}}>{title}</h2>
-    <p className="font-notes mt-2" style={{color: 'hsl(25 15% 40%)', fontSize: '1rem'}}>{subtitle}</p>
-    <img src={image} alt={imageAlt} className={`mt-6 w-full object-contain ${imageClass ?? 'h-40 md:h-48'}`} />
-    <div className="font-hand mt-4" style={{fontSize: '1.3rem', color: 'hsl(145 25% 30%)'}}>otevřít →</div>
+    <h2 className="font-hand text-2xl md:text-4xl" style={{color: 'hsl(25 30% 15%)'}}>{title}</h2>
+    <p className="font-notes mt-2 text-xs md:text-base" style={{color: 'hsl(25 15% 40%)'}}>{subtitle}</p>
+    <img src={image} alt={imageAlt} className={`mt-4 w-full object-contain ${imageClass ?? 'h-32 md:h-48'}`} />
+    <div className="font-hand mt-3 text-base md:text-xl" style={{color: 'hsl(145 25% 30%)'}}>otevřít →</div>
   </button>
 )
 
@@ -25,10 +25,10 @@ export default function HomePage() {
       <Header />
 
       <main className="mx-auto max-w-6xl px-4 md:px-8 py-10 md:py-16">
-        <h2 className="font-hand" style={{fontSize: '3rem', color: 'hsl(25 30% 15%)'}}>
+        <h2 className="font-hand text-3xl md:text-5xl" style={{color: 'hsl(25 30% 15%)'}}>
           Místa, která jsme spolu objevili
         </h2>
-        <p className="font-notes mt-3 max-w-2xl" style={{color: 'hsl(25 15% 40%)', fontSize: '1.1rem'}}>
+        <p className="font-notes mt-3 max-w-2xl text-sm md:text-lg" style={{color: 'hsl(25 15% 40%)'}}>
           Momentky, které tvoří náš příběh — hory, voda, lezení, koncerty a kilometry v obytňáku.
         </p>
 
@@ -40,7 +40,7 @@ export default function HomePage() {
             rotate={-1.2}
             image="/map-illustration.png"
             imageAlt="Ilustrace mapy"
-            imageClass="h-52 md:h-60"
+            imageClass="h-36 md:h-60"
           />
           <Tile
             onClick={() => router.push('/timeline')}
@@ -49,7 +49,7 @@ export default function HomePage() {
             rotate={1.2}
             image="/timeline-illustration.png"
             imageAlt="Ilustrace časové osy"
-            imageClass="h-64 md:h-72"
+            imageClass="h-44 md:h-72"
           />
         </div>
 

@@ -28,39 +28,42 @@ export default function LoginPage() {
   return (
     <div className="relative min-h-screen flex items-center justify-center px-4 py-12" style={{background: '#ffffff'}}>
       {/* Dekorativní obrázky */}
+      {/* Viditelné na všech velikostech */}
       <img src="/01_paragliding_transparent.png" alt="" aria-hidden
         className="pointer-events-none select-none absolute opacity-80"
-        style={{left: '50%', top: '20px', width: '166px', transform: 'translateX(-50%) rotate(-3deg)', zIndex: 5}} />
+        style={{left: '60%', top: '35px', width: '144px', transform: 'rotate(-3deg)', zIndex: 5}} />
       <img src="/02_paddleboard_woman_transparent.png" alt="" aria-hidden
         className="pointer-events-none select-none absolute opacity-80"
-        style={{left: '420px', bottom: '18%', width: '165px', transform: 'rotate(6deg)', zIndex: 5}} />
-      <img src="/03_via_ferrata_transparent.png" alt="" aria-hidden
-        className="pointer-events-none select-none absolute opacity-80"
-        style={{right: 'calc(50% + 280px)', top: '38%', width: '143px', transform: 'rotate(-8deg)', zIndex: 5}} />
-      <img src="/04_cycling_woman_transparent.png" alt="" aria-hidden
-        className="pointer-events-none select-none absolute opacity-80"
-        style={{left: 'calc(50% + 260px)', top: '44%', width: '157px', transform: 'rotate(7deg)', zIndex: 5}} />
-      <img src="/09_tent_campfire_transparent.png" alt="" aria-hidden
-        className="pointer-events-none select-none absolute opacity-80"
-        style={{right: '750px', bottom: '8%', width: '166px', transform: 'rotate(-6deg)', zIndex: 5}} />
+        style={{left: '35%', top: '95px', width: '110px', transform: 'translateX(-50%) rotate(6deg)', zIndex: 5}} />
       <img src="/11_van_scene_transparent.png" alt="" aria-hidden
         className="pointer-events-none select-none absolute opacity-80"
-        style={{right: '400px', top: '35%', width: '162px', transform: 'rotate(5deg)', zIndex: 5}} />
+        style={{left: '44%', bottom: '110px', width: '130px', transform: 'translateX(-50%) rotate(3deg)', zIndex: 5}} />
+
+      {/* Viditelné pouze na větších obrazovkách */}
+      <img src="/03_via_ferrata_transparent.png" alt="" aria-hidden
+        className="hidden lg:block pointer-events-none select-none absolute opacity-80"
+        style={{right: 'calc(50% + 280px)', top: '38%', width: '143px', transform: 'rotate(-8deg)', zIndex: 5}} />
+      <img src="/04_cycling_woman_transparent.png" alt="" aria-hidden
+        className="hidden lg:block pointer-events-none select-none absolute opacity-80"
+        style={{left: 'calc(50% + 260px)', top: '48%', width: '133px', transform: 'rotate(7deg)', zIndex: 5}} />
+      <img src="/09_tent_campfire_transparent.png" alt="" aria-hidden
+        className="hidden lg:block pointer-events-none select-none absolute opacity-80"
+        style={{right: '750px', bottom: '8%', width: '166px', transform: 'rotate(-6deg)', zIndex: 5}} />
 
       {/* Polaroid vlevo */}
-      <div className="polaroid hidden lg:block absolute" style={{top: '8%', left: '420px', width: '265px', transform: 'rotate(-5deg)', zIndex: 10}}>
+      <div className="polaroid hidden lg:block absolute" style={{top: '15%', left: '220px', width: '265px', transform: 'rotate(-5deg)', zIndex: 10}}>
         <img src="/IMG_8882.jpg" style={{height: '178px', width: '100%', objectFit: 'cover', borderRadius: '2px', display: 'block'}} alt="" />
         <p className="font-notes text-xs text-center mt-2" style={{color: 'hsl(25 15% 40%)'}}>Spolu v horách</p>
       </div>
 
       {/* Polaroid vpravo nahoře */}
-      <div className="polaroid hidden lg:block absolute" style={{top: '2%', right: '460px', width: '265px', transform: 'rotate(4deg)', zIndex: 10}}>
+      <div className="polaroid hidden lg:block absolute" style={{top: '8%', right: '220px', width: '265px', transform: 'rotate(4deg)', zIndex: 10}}>
         <img src="/IMG_3236.jpg" style={{height: '178px', width: '100%', objectFit: 'cover', borderRadius: '2px', display: 'block'}} alt="" />
         <p className="font-notes text-xs text-center mt-2" style={{color: 'hsl(25 15% 40%)'}}>Liška Eliška</p>
       </div>
 
       {/* Polaroid vpravo dole */}
-      <div className="polaroid hidden lg:block absolute" style={{bottom: '12%', right: '400px', width: '265px', transform: 'rotate(-3deg)', zIndex: 10}}>
+      <div className="polaroid hidden lg:block absolute" style={{bottom: '10%', right: '350px', width: '265px', transform: 'rotate(-3deg)', zIndex: 10}}>
         <img src="/IMG_8829.jpg" style={{height: '178px', width: '100%', objectFit: 'cover', borderRadius: '2px', display: 'block'}} alt="" />
         <p className="font-notes text-xs text-center mt-2" style={{color: 'hsl(25 15% 40%)'}}>Poprvé ve Švýcarsku</p>
       </div>

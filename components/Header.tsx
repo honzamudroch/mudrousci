@@ -1,5 +1,6 @@
 'use client'
 
+import { useState } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
 import { createClient } from '@/lib/supabase'
 
@@ -7,6 +8,7 @@ export default function Header({ countLabel }: { countLabel?: string } = {}) {
   const router = useRouter()
   const pathname = usePathname()
   const supabase = createClient()
+  const [menuOpen, setMenuOpen] = useState(false)
 
   const handleLogout = async () => {
     await supabase.auth.signOut()
@@ -24,8 +26,8 @@ export default function Header({ countLabel }: { countLabel?: string } = {}) {
     <header style={{borderBottom: '1px solid #000000', background: '#ffffff', overflow: 'visible', position: 'relative'}}>
       <div className="relative mx-auto max-w-7xl px-4 md:px-8 py-4 md:py-5 flex items-center justify-between gap-6" style={{overflow: 'visible'}}>
 
-        {/* Vlevo — logo + název */}
-        <div className="flex items-center gap-4 shrink-0 cursor-pointer" onClick={() => router.push('/home')}>
+        {/* Desktop logo — text */}
+        <div className="hidden md:flex items-center gap-4 shrink-0 cursor-pointer" onClick={() => router.push('/home')}>
           <div>
             <span className="font-hand leading-none block" style={{fontSize: '2.4rem', color: 'hsl(25 30% 15%)'}}>
               Naše cesta ...
@@ -36,7 +38,14 @@ export default function Header({ countLabel }: { countLabel?: string } = {}) {
           </div>
         </div>
 
-        {/* Střed — navigace (absolutně centrovaná) */}
+        {/* Mobilní logo — obrázek centrovaný */}
+        <div className="md:hidden absolute left-1/2 -translate-x-1/2 cursor-pointer" onClick={() => router.push('/home')}>
+          <img src="/header-illustration.png" alt="Naše cesta"
+            className="object-contain"
+            style={{height: '82px', width: 'auto'}} />
+        </div>
+
+        {/* Desktop navigace */}
         <nav className="hidden md:flex items-center gap-6 whitespace-nowrap absolute left-[42%] top-1/2 -translate-x-1/2 -translate-y-1/2" style={{zIndex: 2}}>
           <button onClick={() => router.push('/home')} className={linkClass('/home')}
             style={{color: 'hsl(25 30% 15%)'}}>
@@ -57,7 +66,7 @@ export default function Header({ countLabel }: { countLabel?: string } = {}) {
           </button>
         </nav>
 
-        {/* Vpravo — ilustrace, přetéká dolů pod header */}
+        {/* Desktop ilustrace vpravo */}
         <img src="/header-illustration.png" alt=""
           className="hidden md:block object-contain object-bottom"
           style={{
@@ -69,15 +78,41 @@ export default function Header({ countLabel }: { countLabel?: string } = {}) {
             zIndex: 1,
             pointerEvents: 'none',
           }} />
+
+        {/* Hamburger tlačítko — pouze mobil */}
+        <button
+          className="md:hidden flex flex-col justify-center items-center gap-1.5 w-10 h-10 rounded-lg"
+          style={{background: '#f5f0ea'}}
+          onClick={() => setMenuOpen(o => !o)}>
+          <span className="block w-5 h-0.5 rounded" style={{background: menuOpen ? 'transparent' : 'hsl(25 30% 15%)', transition: 'all 0.2s'}} />
+          <span className="block w-5 h-0.5 rounded" style={{background: 'hsl(25 30% 15)'}} />
+          <span className="block w-5 h-0.5 rounded" style={{background: menuOpen ? 'transparent' : 'hsl(25 30% 15%)', transition: 'all 0.2s'}} />
+        </button>
       </div>
 
-      {/* Mobilní navigace */}
-      <nav className="md:hidden flex items-center gap-4 px-4 pb-3 overflow-x-auto">
-        <button onClick={() => router.push('/home')} className="font-hand text-xl" style={{color: 'hsl(25 30% 15%)'}}>Domů</button>
-        <button onClick={() => router.push('/map')} className="font-hand text-xl" style={{color: 'hsl(25 30% 15%)'}}>Mapa</button>
-        <button onClick={() => router.push('/timeline')} className="font-hand text-xl" style={{color: 'hsl(25 30% 15%)'}}>Časová osa</button>
-        <button onClick={handleLogout} className="font-notes text-sm ml-auto underline" style={{color: 'hsl(25 15% 40%)'}}>odhlásit</button>
-      </nav>
+      {/* Mobilní rozbalovací menu */}
+      {menuOpen && (
+        <nav className="md:hidden flex flex-col px-6 pb-6 pt-2 gap-4"
+          style={{borderTop: '1px solid #e0e0e0', background: '#ffffff'}}>
+          <button onClick={() => { router.push('/home'); setMenuOpen(false) }}
+            className={linkClass('/home')} style={{color: 'hsl(25 30% 15%)', textAlign: 'left'}}>
+            Domů
+          </button>
+          <button onClick={() => { router.push('/map'); setMenuOpen(false) }}
+            className={linkClass('/map')} style={{color: 'hsl(25 30% 15%)', textAlign: 'left'}}>
+            Mapa
+          </button>
+          <button onClick={() => { router.push('/timeline'); setMenuOpen(false) }}
+            className={linkClass('/timeline')} style={{color: 'hsl(25 30% 15%)', textAlign: 'left'}}>
+            Časová osa
+          </button>
+          <button onClick={handleLogout}
+            className="font-notes text-sm underline decoration-dotted text-left"
+            style={{color: 'hsl(25 15% 40%)'}}>
+            odhlásit
+          </button>
+        </nav>
+      )}
     </header>
   )
 }

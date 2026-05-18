@@ -95,12 +95,12 @@ export default function TimelinePage() {
 
       <main className="flex-1 mx-auto max-w-5xl w-full px-4 md:px-8 py-4 md:py-6">
         <div className="flex items-center justify-between">
-          <h1 className="font-hand" style={{ fontSize: '3.5rem', color: 'hsl(25 30% 15%)' }}>
+          <h1 className="font-hand hidden md:block" style={{ fontSize: '3.5rem', color: 'hsl(25 30% 15%)' }}>
             Jak roky plynou..
           </h1>
           <div
             onClick={() => { setEditEvent(null); setShowEdit(true) }}
-            className="shrink-0 hover:scale-105 transition-transform flex flex-col items-center gap-1 mr-32 cursor-pointer"
+            className="shrink-0 hover:scale-105 transition-transform flex flex-col items-center gap-1 md:mr-32 mx-auto cursor-pointer"
           >
             <svg width="52" height="52" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
               <defs>
@@ -150,7 +150,7 @@ export default function TimelinePage() {
               {/* Rok — velký nadpis + čára */}
               <div className="flex items-center gap-6 mb-6">
                 <h2 className="font-hand leading-none"
-                  style={{ fontSize: '5rem', fontWeight: 800, color: 'hsl(25 30% 15%)' }}>
+                  style={{ fontSize: 'clamp(2.5rem, 8vw, 5rem)', fontWeight: 800, color: 'hsl(25 30% 15%)' }}>
                   {year}
                 </h2>
                 <div className="flex-1 h-px" style={{ background: 'hsl(25 30% 15% / 0.3)' }} />
@@ -178,20 +178,20 @@ export default function TimelinePage() {
                           }}
                           onClick={() => setSelectedEvent(event)}
                         >
-                          {/* Ikonka pro levé karty — vpravo nahoře */}
+                          {/* Ikonka pro levé karty — vpravo nahoře, pouze desktop */}
                           {isLeft && (
-                            <img src={typeInfo.timelineImage} alt="" style={{
+                            <img src={typeInfo.timelineImage} alt="" className="hidden md:block" style={{
                               position: 'absolute', top: 10, right: 40,
                               width: 75 - (typeInfo.iconPadding ?? 0), height: 75 - (typeInfo.iconPadding ?? 0), objectFit: 'contain', mixBlendMode: 'multiply', filter: 'contrast(1.5)',
                             }} />
                           )}
 
-                          <div className={`flex flex-col ${isLeft ? 'md:flex-row' : 'md:flex-row-reverse'} gap-4`}>
+                          <div className={`flex flex-col items-center md:items-start ${isLeft ? 'md:flex-row' : 'md:flex-row-reverse'} gap-4`}>
                             {/* Pro pravé karty — ikonka vedle fotky */}
                             {isLeft
                               ? <PolaroidPhoto src={event.photo_url} rotate={-rotate * 2} />
                               : <div className="flex items-start gap-2 shrink-0">
-                                  <img src={typeInfo.timelineImage} alt="" style={{ width: 75 - (typeInfo.iconPadding ?? 0), height: 75 - (typeInfo.iconPadding ?? 0), objectFit: 'contain', mixBlendMode: 'multiply', filter: 'contrast(1.5)', marginTop: 8 }} />
+                                  <img src={typeInfo.timelineImage} alt="" className="hidden md:block" style={{ width: 75 - (typeInfo.iconPadding ?? 0), height: 75 - (typeInfo.iconPadding ?? 0), objectFit: 'contain', mixBlendMode: 'multiply', filter: 'contrast(1.5)', marginTop: 8 }} />
                                   <PolaroidPhoto src={event.photo_url} rotate={-rotate * 2} />
                                 </div>
                             }
