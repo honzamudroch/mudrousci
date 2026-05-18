@@ -111,8 +111,7 @@ export default function EventDetail({ event, onClose, onEdit, onDeleted }: Props
           <div className="flex items-center gap-2 mb-3">
             <span className="inline-flex items-center gap-1 font-notes text-xs px-2.5 py-1 rounded-full"
               style={{ background: typeInfo.color + '20', color: typeInfo.color }}>
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" style={{ color: typeInfo.color }}
-                dangerouslySetInnerHTML={{ __html: typeInfo.svg }} />
+              <img src={typeInfo.timelineImage} style={{ width: 14, height: 14, objectFit: 'contain', mixBlendMode: 'multiply' }} alt="" />
               {typeInfo.label}
             </span>
             <span className="font-notes text-xs uppercase tracking-widest"
