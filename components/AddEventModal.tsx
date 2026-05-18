@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, useCallback } from 'react'
 import { createClient } from '@/lib/supabase'
 import { EVENT_TYPES } from '@/lib/eventTypes'
 
@@ -53,19 +53,62 @@ export default function AddEventModal({ coords, editEvent, onClose, onSaved }: P
   const [files, setFiles] = useState<File[]>([])
   const [previews, setPreviews] = useState<string[]>([])
   const [existingPhotos, setExistingPhotos] = useState<{ id: string; url: string }[]>([])
-  // primaryUrl = přímo URL náhledové fotky (nebo null)
   const [primaryUrl, setPrimaryUrl] = useState<string | null>(editEvent?.photo_url ?? null)
   const [loading, setLoading] = useState(false)
   const [saveError, setSaveError] = useState<string | null>(null)
+
+  // Geocoding
+  const [geoQuery, setGeoQuery] = useState(
+    isEdit ? ((editEvent as any)?.location_name ?? '') : (coords ? '' : '')
+  )
+  const [geoResults, setGeoResults] = useState<{ name: string; lat: number; lng: number }[]>([])
+  const [geoLoading, setGeoLoading] = useState(false)
+  const [geoPicked, setGeoPicked] = useState(!!(editEvent?.lat) || !!(coords?.lat))
+  const geoTimeout = useRef<ReturnType<typeof setTimeout> | null>(null)
+
   const fileInputRef = useRef<HTMLInputElement>(null)
   const supabase = createClient()
+
+  const searchAddress = useCallback((q: string) => {
+    setGeoQuery(q)
+    setGeoPicked(false)
+    if (geoTimeout.current) clearTimeout(geoTimeout.current)
+    if (q.trim().length < 2) { setGeoResults([]); return }
+    geoTimeout.current = setTimeout(async () => {
+      setGeoLoading(true)
+      try {
+        const token = process.env.NEXT_PUBLIC_MAPBOX_TOKEN
+        const res = await fetch(
+          `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(q)}.json?access_token=${token}&language=cs&limit=5`
+        )
+        const data = await res.json()
+        setGeoResults(
+          (data.features ?? []).map((f: any) => ({
+            name: f.place_name,
+            lat: f.center[1],
+            lng: f.center[0],
+          }))
+        )
+      } finally {
+        setGeoLoading(false)
+      }
+    }, 350)
+  }, [])
+
+  const pickGeoResult = (r: { name: string; lat: number; lng: number }) => {
+    setManualLat(r.lat.toFixed(6))
+    setManualLng(r.lng.toFixed(6))
+    if (!locationName) setLocationName(r.name.split(',')[0])
+    setGeoQuery(r.name.split(',')[0])
+    setGeoResults([])
+    setGeoPicked(true)
+  }
 
   useEffect(() => {
     if (isEdit && editEvent) {
       supabase.from('event_photos').select('*').eq('event_id', editEvent.id).then(({ data }) => {
         if (data) {
           setExistingPhotos(data)
-          // Nastav primary na první fotku pokud ještě není nastavena
           if (data.length > 0 && !primaryUrl) {
             setPrimaryUrl(data[0].url)
           }
@@ -79,7 +122,6 @@ export default function AddEventModal({ coords, editEvent, onClose, onSaved }: P
     setFiles(prev => [...prev, ...selected])
     const newPreviews = selected.map(f => URL.createObjectURL(f))
     setPreviews(prev => {
-      // Pokud zatím žádná primary, nastav první přidanou fotku
       if (!primaryUrl && prev.length === 0 && existingPhotos.length === 0) {
         setPrimaryUrl(newPreviews[0])
       }
@@ -102,13 +144,15 @@ export default function AddEventModal({ coords, editEvent, onClose, onSaved }: P
     setSaveError(null)
     const lat = parseFloat(manualLat)
     const lng = parseFloat(manualLng)
-    if (isNaN(lat) || isNaN(lng)) { setSaveError('Neplatné souřadnice'); return }
+    if (isNaN(lat) || isNaN(lng)) {
+      setSaveError('Vyber místo pomocí vyhledávání nebo klikni na mapu')
+      return
+    }
     setLoading(true)
 
     try {
       let eventId = editEvent?.id
 
-      // 1. Ulož základní data události včetně location_name
       if (isEdit) {
         const { error } = await supabase.from('events')
           .update({ title, description, date, type, location_name: locationName })
@@ -124,7 +168,6 @@ export default function AddEventModal({ coords, editEvent, onClose, onSaved }: P
 
       if (!eventId) throw new Error('Nepodařilo se získat ID události')
 
-      // 3. Nahraj nové fotky a zmapuj blob URL → finální Supabase URL
       const uploadedUrls: string[] = []
       const previewToFinal: Record<string, string> = {}
       for (let i = 0; i < files.length; i++) {
@@ -141,13 +184,11 @@ export default function AddEventModal({ coords, editEvent, onClose, onSaved }: P
         }
       }
 
-      // 4. Urči thumbnail URL — hvězdička → přelož blob na finální, fallback na první dostupnou
       const resolvedPrimary = primaryUrl
         ? (previewToFinal[primaryUrl] ?? (primaryUrl.startsWith('blob:') ? null : primaryUrl))
         : null
       const thumbnailUrl = resolvedPrimary ?? uploadedUrls[0] ?? existingPhotos[0]?.url ?? null
 
-      // 5. Vždy ulož photo_url (i null pro reset)
       const { error: thumbErr } = await supabase.from('events')
         .update({ photo_url: thumbnailUrl })
         .eq('id', eventId)
@@ -169,7 +210,6 @@ export default function AddEventModal({ coords, editEvent, onClose, onSaved }: P
       <div className="paper-card rounded-2xl shadow-2xl w-full max-w-md relative max-h-[90vh] overflow-y-auto"
         style={{ border: '1px solid hsl(30 25% 80%)', background: '#ffffff' }}>
 
-        {/* Zavírací tlačítko */}
         <button onClick={onClose}
           className="absolute top-4 right-4 z-10 w-8 h-8 rounded-full flex items-center justify-center transition-colors font-notes text-lg"
           style={{ color: 'hsl(25 15% 50%)', background: '#f0f0f0' }}>
@@ -200,48 +240,64 @@ export default function AddEventModal({ coords, editEvent, onClose, onSaved }: P
               </div>
             </div>
 
-            {/* Souřadnice — vložení GPS nebo DMS */}
-            <div>
-              <Label>GPS souřadnice</Label>
-              <input
-                type="text"
-                className={inputCls} style={inputStyle}
-                placeholder={"47°25'54.5\"N 12°32'28.0\"E nebo 50.0755, 14.4378"}
-                onChange={e => {
-                  const val = e.target.value.trim()
-                  // DMS formát: 47°25'54.5"N 12°32'28.0"E
-                  const dms = val.match(/(\d+)°(\d+)'([\d.]+)"([NS])\s+(\d+)°(\d+)'([\d.]+)"([EW])/i)
-                  if (dms) {
-                    const lat = parseFloat(dms[1]) + parseFloat(dms[2])/60 + parseFloat(dms[3])/3600
-                    const lng = parseFloat(dms[5]) + parseFloat(dms[6])/60 + parseFloat(dms[7])/3600
-                    setManualLat(String((dms[4].toUpperCase() === 'S' ? -lat : lat).toFixed(6)))
-                    setManualLng(String((dms[8].toUpperCase() === 'W' ? -lng : lng).toFixed(6)))
-                    return
-                  }
-                  // Decimal formát: 50.0755, 14.4378
-                  const dec = val.match(/([-\d.]+)[,\s]+([-\d.]+)/)
-                  if (dec) {
-                    setManualLat(dec[1])
-                    setManualLng(dec[2])
-                  }
-                }}
-              />
-              <div className="flex gap-3 mt-2">
-                <div className="flex-1">
-                  <Label>Šířka</Label>
-                  <input type="number" step="any" value={manualLat}
-                    onChange={e => setManualLat(e.target.value)}
-                    className={inputCls} style={inputStyle}
-                    placeholder="50.0755" required />
-                </div>
-                <div className="flex-1">
-                  <Label>Délka</Label>
-                  <input type="number" step="any" value={manualLng}
-                    onChange={e => setManualLng(e.target.value)}
-                    className={inputCls} style={inputStyle}
-                    placeholder="14.4378" required />
-                </div>
+            {/* Vyhledávání místa — nahrazuje GPS pole */}
+            <div className="relative">
+              <Label>Místo na mapě</Label>
+              <div className="relative">
+                <input
+                  type="text"
+                  value={geoQuery}
+                  onChange={e => searchAddress(e.target.value)}
+                  className={inputCls}
+                  style={{
+                    ...inputStyle,
+                    paddingRight: '2.5rem',
+                    border: geoPicked
+                      ? '1px solid hsl(145 40% 50%)'
+                      : '1px solid hsl(30 25% 80%)',
+                  }}
+                  placeholder="Strážné, Dolomity, Praha…"
+                  autoComplete="off"
+                />
+                {geoPicked && (
+                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-base"
+                    style={{ color: 'hsl(145 40% 45%)' }}>✓</span>
+                )}
+                {geoLoading && (
+                  <span className="absolute right-3 top-1/2 -translate-y-1/2 font-notes text-xs"
+                    style={{ color: 'hsl(25 15% 55%)' }}>hledám…</span>
+                )}
               </div>
+
+              {/* Výsledky */}
+              {geoResults.length > 0 && (
+                <ul className="absolute z-20 w-full mt-1 rounded-xl overflow-hidden shadow-lg"
+                  style={{ border: '1px solid hsl(30 25% 80%)', background: '#fff' }}>
+                  {geoResults.map((r, i) => (
+                    <li key={i}>
+                      <button
+                        type="button"
+                        onClick={() => pickGeoResult(r)}
+                        className="w-full text-left px-4 py-2.5 font-notes text-sm"
+                        style={{
+                          color: 'hsl(25 30% 15%)',
+                          borderBottom: i < geoResults.length - 1 ? '1px solid #f0f0f0' : 'none',
+                          background: 'transparent',
+                        }}
+                        onMouseEnter={e => (e.currentTarget.style.background = '#f9f5f0')}
+                        onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
+                      >
+                        <span className="font-semibold">{r.name.split(',')[0]}</span>
+                        {r.name.includes(',') && (
+                          <span style={{ color: 'hsl(25 15% 55%)' }}>
+                            {', ' + r.name.split(',').slice(1).join(',')}
+                          </span>
+                        )}
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
             </div>
 
             {/* Název */}
@@ -303,14 +359,12 @@ export default function AddEventModal({ coords, editEvent, onClose, onSaved }: P
                             style={{ background: isPrimary ? '#f59e0b' : 'rgba(0,0,0,0.4)', color: 'white' }}>
                             ★
                           </button>
-                          {/* Smazat */}
                           <button type="button" onClick={() => removeExistingPhoto(photo.id)}
                             className="absolute top-1 right-1 w-5 h-5 rounded-full bg-black/50 text-white text-xs flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">✕</button>
                         </div>
                       )
                     })}
                     {previews.map((src, i) => {
-                      // Pro nové fotky porovnáváme index — uložíme url po uploadu přes pořadí
                       const isPrimary = primaryUrl === src
                       return (
                         <div key={i} className="relative group rounded-xl overflow-hidden" style={{ height: 90 }}>
@@ -320,7 +374,6 @@ export default function AddEventModal({ coords, editEvent, onClose, onSaved }: P
                             style={{ background: isPrimary ? '#f59e0b' : 'rgba(0,0,0,0.4)', color: 'white' }}>
                             ★
                           </button>
-                          {/* Smazat */}
                           <button type="button" onClick={() => removeNewFile(i)}
                             className="absolute top-1 right-1 w-5 h-5 rounded-full bg-black/50 text-white text-xs flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">✕</button>
                         </div>
@@ -337,14 +390,12 @@ export default function AddEventModal({ coords, editEvent, onClose, onSaved }: P
               )}
             </div>
 
-            {/* Chyba */}
             {saveError && (
               <p className="font-notes text-sm text-center" style={{ color: 'hsl(0 60% 48%)' }}>
                 Chyba: {saveError}
               </p>
             )}
 
-            {/* Uložit */}
             <button type="submit" disabled={loading}
               className="mt-1 w-full py-3.5 rounded-xl font-hand text-2xl transition-colors disabled:opacity-50"
               style={{ background: 'hsl(25 30% 15%)', color: 'hsl(40 35% 95%)' }}>
