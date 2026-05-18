@@ -100,19 +100,14 @@ export default function FotoPage() {
 
               {/* Fotky — Google Photos styl */}
               <div
-                className="flex flex-wrap"
-                style={{ gap: '2px' }}
+                className="grid"
+                style={{ gap: '2px', gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))' }}
               >
                 {group.photos.map((url, i) => (
                   <div
                     key={i}
                     className="cursor-pointer overflow-hidden"
-                    style={{
-                      height: '200px',
-                      flex: '1 1 200px',
-                      maxWidth: '360px',
-                      minWidth: '120px',
-                    }}
+                    style={{ aspectRatio: '1 / 1' }}
                     onClick={() => openLightbox(groupIdx, i)}
                   >
                     <img
@@ -125,8 +120,6 @@ export default function FotoPage() {
                     />
                   </div>
                 ))}
-                {/* Prázdný flex filler — zabrání roztažení posledního řádku */}
-                <div style={{ flex: '10 1 200px', maxWidth: '360px' }} />
               </div>
 
             </section>
