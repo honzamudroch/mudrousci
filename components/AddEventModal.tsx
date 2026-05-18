@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef, useEffect, useCallback } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { createClient } from '@/lib/supabase'
 import { EVENT_TYPES } from '@/lib/eventTypes'
 
@@ -57,45 +57,8 @@ export default function AddEventModal({ coords, editEvent, onClose, onSaved }: P
   const [primaryUrl, setPrimaryUrl] = useState<string | null>(editEvent?.photo_url ?? null)
   const [loading, setLoading] = useState(false)
   const [saveError, setSaveError] = useState<string | null>(null)
-  const [geoQuery, setGeoQuery] = useState('')
-  const [geoResults, setGeoResults] = useState<{ name: string; lat: number; lng: number }[]>([])
-  const [geoLoading, setGeoLoading] = useState(false)
-  const geoTimeout = useRef<ReturnType<typeof setTimeout> | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const supabase = createClient()
-
-  const searchAddress = useCallback((q: string) => {
-    setGeoQuery(q)
-    if (geoTimeout.current) clearTimeout(geoTimeout.current)
-    if (q.trim().length < 2) { setGeoResults([]); return }
-    geoTimeout.current = setTimeout(async () => {
-      setGeoLoading(true)
-      try {
-        const token = process.env.NEXT_PUBLIC_MAPBOX_TOKEN
-        const res = await fetch(
-          `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(q)}.json?access_token=${token}&language=cs&limit=5`
-        )
-        const data = await res.json()
-        setGeoResults(
-          (data.features ?? []).map((f: any) => ({
-            name: f.place_name,
-            lat: f.center[1],
-            lng: f.center[0],
-          }))
-        )
-      } finally {
-        setGeoLoading(false)
-      }
-    }, 350)
-  }, [])
-
-  const pickGeoResult = (r: { name: string; lat: number; lng: number }) => {
-    setManualLat(r.lat.toFixed(6))
-    setManualLng(r.lng.toFixed(6))
-    if (!locationName) setLocationName(r.name.split(',')[0])
-    setGeoQuery('')
-    setGeoResults([])
-  }
 
   useEffect(() => {
     if (isEdit && editEvent) {
@@ -139,7 +102,7 @@ export default function AddEventModal({ coords, editEvent, onClose, onSaved }: P
     setSaveError(null)
     const lat = parseFloat(manualLat)
     const lng = parseFloat(manualLng)
-    if (isNaN(lat) || isNaN(lng)) { setSaveError('Vyber místo pomocí vyhledávání nebo kliknutím na mapu'); return }
+    if (isNaN(lat) || isNaN(lng)) { setSaveError('Neplatné souřadnice'); return }
     setLoading(true)
 
     try {
@@ -237,46 +200,49 @@ export default function AddEventModal({ coords, editEvent, onClose, onSaved }: P
               </div>
             </div>
 
-            {/* Vyhledávání adresy */}
-            <div className="relative">
-              <Label>Hledat adresu</Label>
-              <div className="relative">
-                <input
-                  type="text"
-                  value={geoQuery}
-                  onChange={e => searchAddress(e.target.value)}
-                  className={inputCls}
-                  style={inputStyle}
-                  placeholder="Strážné, Dolomity, Praha..."
-                  autoComplete="off"
-                />
-                {geoLoading && (
-                  <span className="absolute right-3 top-1/2 -translate-y-1/2 font-notes text-xs"
-                    style={{ color: 'hsl(25 15% 55%)' }}>hledám…</span>
-                )}
+            {/* Souřadnice — vložení GPS nebo DMS */}
+            <div>
+              <Label>GPS souřadnice</Label>
+              <input
+                type="text"
+                className={inputCls} style={inputStyle}
+                placeholder={"47°25'54.5\"N 12°32'28.0\"E nebo 50.0755, 14.4378"}
+                onChange={e => {
+                  const val = e.target.value.trim()
+                  // DMS formát: 47°25'54.5"N 12°32'28.0"E
+                  const dms = val.match(/(\d+)°(\d+)'([\d.]+)"([NS])\s+(\d+)°(\d+)'([\d.]+)"([EW])/i)
+                  if (dms) {
+                    const lat = parseFloat(dms[1]) + parseFloat(dms[2])/60 + parseFloat(dms[3])/3600
+                    const lng = parseFloat(dms[5]) + parseFloat(dms[6])/60 + parseFloat(dms[7])/3600
+                    setManualLat(String((dms[4].toUpperCase() === 'S' ? -lat : lat).toFixed(6)))
+                    setManualLng(String((dms[8].toUpperCase() === 'W' ? -lng : lng).toFixed(6)))
+                    return
+                  }
+                  // Decimal formát: 50.0755, 14.4378
+                  const dec = val.match(/([-\d.]+)[,\s]+([-\d.]+)/)
+                  if (dec) {
+                    setManualLat(dec[1])
+                    setManualLng(dec[2])
+                  }
+                }}
+              />
+              <div className="flex gap-3 mt-2">
+                <div className="flex-1">
+                  <Label>Šířka</Label>
+                  <input type="number" step="any" value={manualLat}
+                    onChange={e => setManualLat(e.target.value)}
+                    className={inputCls} style={inputStyle}
+                    placeholder="50.0755" required />
+                </div>
+                <div className="flex-1">
+                  <Label>Délka</Label>
+                  <input type="number" step="any" value={manualLng}
+                    onChange={e => setManualLng(e.target.value)}
+                    className={inputCls} style={inputStyle}
+                    placeholder="14.4378" required />
+                </div>
               </div>
-              {geoResults.length > 0 && (
-                <ul className="absolute z-20 w-full mt-1 rounded-xl overflow-hidden shadow-lg"
-                  style={{ border: '1px solid hsl(30 25% 80%)', background: '#fff' }}>
-                  {geoResults.map((r, i) => (
-                    <li key={i}>
-                      <button
-                        type="button"
-                        onClick={() => pickGeoResult(r)}
-                        className="w-full text-left px-4 py-2.5 font-notes text-sm transition-colors"
-                        style={{ color: 'hsl(25 30% 15%)', borderBottom: i < geoResults.length - 1 ? '1px solid #f0f0f0' : 'none' }}
-                        onMouseEnter={e => (e.currentTarget.style.background = '#f9f5f0')}
-                        onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
-                      >
-                        <span className="font-semibold">{r.name.split(',')[0]}</span>
-                        <span style={{ color: 'hsl(25 15% 55%)' }}>{r.name.includes(',') ? ', ' + r.name.split(',').slice(1).join(',') : ''}</span>
-                      </button>
-                    </li>
-                  ))}
-                </ul>
-              )}
             </div>
-
 
             {/* Název */}
             <div>
