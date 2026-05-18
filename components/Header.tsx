@@ -59,6 +59,10 @@ export default function Header({ countLabel }: { countLabel?: string } = {}) {
             style={{color: 'hsl(25 30% 15%)'}}>
             Časová osa
           </button>
+          <button onClick={() => router.push('/foto')} className={linkClass('/foto')}
+            style={{color: 'hsl(25 30% 15%)'}}>
+            Foto
+          </button>
           <button onClick={handleLogout}
             className="font-notes text-sm underline decoration-dotted"
             style={{color: 'hsl(25 15% 40%)'}}>
@@ -105,6 +109,10 @@ export default function Header({ countLabel }: { countLabel?: string } = {}) {
           <button onClick={() => { router.push('/timeline'); setMenuOpen(false) }}
             className={linkClass('/timeline')} style={{color: 'hsl(25 30% 15%)', textAlign: 'left'}}>
             Časová osa
+          </button>
+          <button onClick={() => { router.push('/foto'); setMenuOpen(false) }}
+            className={linkClass('/foto')} style={{color: 'hsl(25 30% 15%)', textAlign: 'left'}}>
+            Foto
           </button>
           <button onClick={handleLogout}
             className="font-notes text-sm underline decoration-dotted text-left"
