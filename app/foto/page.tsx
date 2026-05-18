@@ -109,7 +109,7 @@ export default function FotoPage() {
                   <div
                     key={pi}
                     className="cursor-pointer overflow-hidden"
-                    style={{ aspectRatio: '1 / 1' }}
+                    style={{ height: '220px' }}
                     onClick={() => setLightbox([gi, pi])}
                   >
                     <img
