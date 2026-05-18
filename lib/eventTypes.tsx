@@ -37,8 +37,8 @@ export const EVENT_TYPES: EventType[] = [
     id: 'hory',
     label: 'Hory',
     color: '#3a8c5c',
-    image: '/carabiner.svg',
-    timelineImage: '/03_via_ferrata_transparent.png',
+    image: '/lezení.png',
+    timelineImage: '/lezení.png',
   },
   {
     id: 'kultura',
