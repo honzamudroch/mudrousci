@@ -36,10 +36,10 @@ export default function LoginPage() {
         style={{left: '420px', bottom: '18%', width: '165px', transform: 'rotate(6deg)', zIndex: 5}} />
       <img src="/03_via_ferrata_transparent.png" alt="" aria-hidden
         className="pointer-events-none select-none absolute opacity-80"
-        style={{right: 'calc(50% + 200px)', top: '38%', width: '143px', transform: 'rotate(-8deg)', zIndex: 5}} />
+        style={{right: 'calc(50% + 280px)', top: '38%', width: '143px', transform: 'rotate(-8deg)', zIndex: 5}} />
       <img src="/04_cycling_woman_transparent.png" alt="" aria-hidden
         className="pointer-events-none select-none absolute opacity-80"
-        style={{left: 'calc(50% + 260px)', top: '38%', width: '157px', transform: 'rotate(7deg)', zIndex: 5}} />
+        style={{left: 'calc(50% + 260px)', top: '44%', width: '157px', transform: 'rotate(7deg)', zIndex: 5}} />
       <img src="/09_tent_campfire_transparent.png" alt="" aria-hidden
         className="pointer-events-none select-none absolute opacity-80"
         style={{right: '750px', bottom: '8%', width: '166px', transform: 'rotate(-6deg)', zIndex: 5}} />
@@ -48,13 +48,13 @@ export default function LoginPage() {
         style={{right: '400px', top: '35%', width: '162px', transform: 'rotate(5deg)', zIndex: 5}} />
 
       {/* Polaroid vlevo */}
-      <div className="polaroid hidden lg:block absolute" style={{top: '20%', left: '460px', width: '265px', transform: 'rotate(-5deg)', zIndex: 10}}>
+      <div className="polaroid hidden lg:block absolute" style={{top: '8%', left: '420px', width: '265px', transform: 'rotate(-5deg)', zIndex: 10}}>
         <img src="/IMG_8882.jpg" style={{height: '178px', width: '100%', objectFit: 'cover', borderRadius: '2px', display: 'block'}} alt="" />
         <p className="font-notes text-xs text-center mt-2" style={{color: 'hsl(25 15% 40%)'}}>Spolu v horách</p>
       </div>
 
       {/* Polaroid vpravo nahoře */}
-      <div className="polaroid hidden lg:block absolute" style={{top: '5%', right: '550px', width: '265px', transform: 'rotate(4deg)', zIndex: 10}}>
+      <div className="polaroid hidden lg:block absolute" style={{top: '2%', right: '460px', width: '265px', transform: 'rotate(4deg)', zIndex: 10}}>
         <img src="/IMG_3236.jpg" style={{height: '178px', width: '100%', objectFit: 'cover', borderRadius: '2px', display: 'block'}} alt="" />
         <p className="font-notes text-xs text-center mt-2" style={{color: 'hsl(25 15% 40%)'}}>Liška Eliška</p>
       </div>
