@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, useCallback } from 'react'
 import { createClient } from '@/lib/supabase'
 import { EVENT_TYPES } from '@/lib/eventTypes'
 
@@ -57,8 +57,45 @@ export default function AddEventModal({ coords, editEvent, onClose, onSaved }: P
   const [primaryUrl, setPrimaryUrl] = useState<string | null>(editEvent?.photo_url ?? null)
   const [loading, setLoading] = useState(false)
   const [saveError, setSaveError] = useState<string | null>(null)
+  const [geoQuery, setGeoQuery] = useState('')
+  const [geoResults, setGeoResults] = useState<{ name: string; lat: number; lng: number }[]>([])
+  const [geoLoading, setGeoLoading] = useState(false)
+  const geoTimeout = useRef<ReturnType<typeof setTimeout> | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const supabase = createClient()
+
+  const searchAddress = useCallback((q: string) => {
+    setGeoQuery(q)
+    if (geoTimeout.current) clearTimeout(geoTimeout.current)
+    if (q.trim().length < 2) { setGeoResults([]); return }
+    geoTimeout.current = setTimeout(async () => {
+      setGeoLoading(true)
+      try {
+        const token = process.env.NEXT_PUBLIC_MAPBOX_TOKEN
+        const res = await fetch(
+          `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(q)}.json?access_token=${token}&language=cs&limit=5`
+        )
+        const data = await res.json()
+        setGeoResults(
+          (data.features ?? []).map((f: any) => ({
+            name: f.place_name,
+            lat: f.center[1],
+            lng: f.center[0],
+          }))
+        )
+      } finally {
+        setGeoLoading(false)
+      }
+    }, 350)
+  }, [])
+
+  const pickGeoResult = (r: { name: string; lat: number; lng: number }) => {
+    setManualLat(r.lat.toFixed(6))
+    setManualLng(r.lng.toFixed(6))
+    if (!locationName) setLocationName(r.name.split(',')[0])
+    setGeoQuery('')
+    setGeoResults([])
+  }
 
   useEffect(() => {
     if (isEdit && editEvent) {
@@ -198,6 +235,46 @@ export default function AddEventModal({ coords, editEvent, onClose, onSaved }: P
                   </button>
                 ))}
               </div>
+            </div>
+
+            {/* Vyhledávání adresy */}
+            <div className="relative">
+              <Label>Hledat místo</Label>
+              <div className="relative">
+                <input
+                  type="text"
+                  value={geoQuery}
+                  onChange={e => searchAddress(e.target.value)}
+                  className={inputCls}
+                  style={inputStyle}
+                  placeholder="Strážné, Dolomity, Praha..."
+                  autoComplete="off"
+                />
+                {geoLoading && (
+                  <span className="absolute right-3 top-1/2 -translate-y-1/2 font-notes text-xs"
+                    style={{ color: 'hsl(25 15% 55%)' }}>hledám…</span>
+                )}
+              </div>
+              {geoResults.length > 0 && (
+                <ul className="absolute z-20 w-full mt-1 rounded-xl overflow-hidden shadow-lg"
+                  style={{ border: '1px solid hsl(30 25% 80%)', background: '#fff' }}>
+                  {geoResults.map((r, i) => (
+                    <li key={i}>
+                      <button
+                        type="button"
+                        onClick={() => pickGeoResult(r)}
+                        className="w-full text-left px-4 py-2.5 font-notes text-sm transition-colors"
+                        style={{ color: 'hsl(25 30% 15%)', borderBottom: i < geoResults.length - 1 ? '1px solid #f0f0f0' : 'none' }}
+                        onMouseEnter={e => (e.currentTarget.style.background = '#f9f5f0')}
+                        onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
+                      >
+                        <span className="font-semibold">{r.name.split(',')[0]}</span>
+                        <span style={{ color: 'hsl(25 15% 55%)' }}>{r.name.includes(',') ? ', ' + r.name.split(',').slice(1).join(',') : ''}</span>
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
             </div>
 
             {/* Souřadnice — vložení GPS nebo DMS */}
