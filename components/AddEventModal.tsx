@@ -139,7 +139,7 @@ export default function AddEventModal({ coords, editEvent, onClose, onSaved }: P
     setSaveError(null)
     const lat = parseFloat(manualLat)
     const lng = parseFloat(manualLng)
-    if (isNaN(lat) || isNaN(lng)) { setSaveError('Neplatné souřadnice'); return }
+    if (isNaN(lat) || isNaN(lng)) { setSaveError('Vyber místo pomocí vyhledávání nebo kliknutím na mapu'); return }
     setLoading(true)
 
     try {
@@ -239,7 +239,7 @@ export default function AddEventModal({ coords, editEvent, onClose, onSaved }: P
 
             {/* Vyhledávání adresy */}
             <div className="relative">
-              <Label>Hledat místo</Label>
+              <Label>Hledat adresu</Label>
               <div className="relative">
                 <input
                   type="text"
@@ -277,49 +277,6 @@ export default function AddEventModal({ coords, editEvent, onClose, onSaved }: P
               )}
             </div>
 
-            {/* Souřadnice — vložení GPS nebo DMS */}
-            <div>
-              <Label>GPS souřadnice</Label>
-              <input
-                type="text"
-                className={inputCls} style={inputStyle}
-                placeholder={"47°25'54.5\"N 12°32'28.0\"E nebo 50.0755, 14.4378"}
-                onChange={e => {
-                  const val = e.target.value.trim()
-                  // DMS formát: 47°25'54.5"N 12°32'28.0"E
-                  const dms = val.match(/(\d+)°(\d+)'([\d.]+)"([NS])\s+(\d+)°(\d+)'([\d.]+)"([EW])/i)
-                  if (dms) {
-                    const lat = parseFloat(dms[1]) + parseFloat(dms[2])/60 + parseFloat(dms[3])/3600
-                    const lng = parseFloat(dms[5]) + parseFloat(dms[6])/60 + parseFloat(dms[7])/3600
-                    setManualLat(String((dms[4].toUpperCase() === 'S' ? -lat : lat).toFixed(6)))
-                    setManualLng(String((dms[8].toUpperCase() === 'W' ? -lng : lng).toFixed(6)))
-                    return
-                  }
-                  // Decimal formát: 50.0755, 14.4378
-                  const dec = val.match(/([-\d.]+)[,\s]+([-\d.]+)/)
-                  if (dec) {
-                    setManualLat(dec[1])
-                    setManualLng(dec[2])
-                  }
-                }}
-              />
-              <div className="flex gap-3 mt-2">
-                <div className="flex-1">
-                  <Label>Šířka</Label>
-                  <input type="number" step="any" value={manualLat}
-                    onChange={e => setManualLat(e.target.value)}
-                    className={inputCls} style={inputStyle}
-                    placeholder="50.0755" required />
-                </div>
-                <div className="flex-1">
-                  <Label>Délka</Label>
-                  <input type="number" step="any" value={manualLng}
-                    onChange={e => setManualLng(e.target.value)}
-                    className={inputCls} style={inputStyle}
-                    placeholder="14.4378" required />
-                </div>
-              </div>
-            </div>
 
             {/* Název */}
             <div>
