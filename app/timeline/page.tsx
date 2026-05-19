@@ -100,7 +100,7 @@ export default function TimelinePage() {
           </h1>
           <div
             onClick={() => { setEditEvent(null); setShowEdit(true) }}
-            className="shrink-0 hover:scale-105 transition-transform flex flex-col items-center gap-1 md:mr-32 mx-auto cursor-pointer"
+            className="hidden md:flex shrink-0 hover:scale-105 transition-transform flex-col items-center gap-1 md:mr-32 cursor-pointer"
           >
             <svg width="52" height="52" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
               <defs>
@@ -237,6 +237,18 @@ export default function TimelinePage() {
           </div>
         )}
       </main>
+
+      {/* Plovoucí tlačítko — pouze mobil */}
+      <button
+        onClick={() => { setEditEvent(null); setShowEdit(true) }}
+        className="md:hidden fixed bottom-8 right-6 z-20 w-14 h-14 rounded-full shadow-lg flex items-center justify-center transition-transform hover:scale-110"
+        style={{ background: 'hsl(25 30% 15%)', color: 'hsl(40 35% 95%)' }}
+      >
+        <svg width="26" height="26" viewBox="0 0 26 26" fill="none">
+          <line x1="13" y1="4" x2="13" y2="22" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"/>
+          <line x1="4" y1="13" x2="22" y2="13" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"/>
+        </svg>
+      </button>
 
       <EventDetail
         event={selectedEvent}
