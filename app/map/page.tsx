@@ -35,7 +35,6 @@ export default function MapPage() {
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null)
   const [clusterEvents, setClusterEvents] = useState<Event[] | null>(null)
   const [events, setEvents] = useState<Event[]>([])
-  const [hint, setHint] = useState(true)
   const supabase = createClient()
 
   const loadEvents = useCallback(async () => {
@@ -58,7 +57,6 @@ export default function MapPage() {
     map.current.addControl(new mapboxgl.NavigationControl(), 'bottom-right')
 
     map.current.on('click', (e) => {
-      setHint(false)
       setPendingCoords({ lat: e.lngLat.lat, lng: e.lngLat.lng })
       setShowModal(true)
     })
@@ -134,11 +132,6 @@ export default function MapPage() {
 
       <Header countLabel={`${events.length} ${pluralVzpominka(events.length)}`} />
 
-      {hint && (
-        <div className="fixed bottom-24 left-1/2 -translate-x-1/2 z-10 bg-white/90 backdrop-blur-sm px-5 py-2.5 rounded-full shadow-sm border border-[#e8e4da] text-sm text-[#8a8070] pointer-events-none">
-          Klikni na mapu pro přidání vzpomínky
-        </div>
-      )}
 
       {/* Plovoucí tlačítko — pouze mobil */}
       <button
