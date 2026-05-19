@@ -13,9 +13,9 @@ export const EVENT_TYPES: EventType[] = [
     id: 'rande',
     label: 'Rande',
     color: '#e85d75',
-    image: '/heart-filled.svg',
+    image: '/transparent_rande_icon.png',
     timelineImage: '/transparent_rande_icon.png',
-    mapIconSize: 26,
+    mapIconSize: 18,
   },
   {
     id: 'kamaradi',
