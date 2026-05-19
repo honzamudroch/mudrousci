@@ -140,15 +140,26 @@ export default function MapPage() {
         </div>
       )}
 
-      {/* Plovoucí tlačítko + Přidat */}
+      {/* Plovoucí tlačítko — pouze mobil */}
       <button
         onClick={() => { setPendingCoords(null); setShowModal(true) }}
         title="Přidat vzpomínku"
-        className="fixed bottom-8 right-8 z-20 w-14 h-14 rounded-full shadow-lg flex items-center justify-center transition-transform hover:scale-110"
-        style={{background: 'hsl(25 30% 15%)', color: 'hsl(40 35% 95%)'}}>
-        <svg width="26" height="26" viewBox="0 0 26 26" fill="none">
-          <line x1="13" y1="4" x2="13" y2="22" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"/>
-          <line x1="4" y1="13" x2="22" y2="13" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"/>
+        className="md:hidden fixed bottom-8 right-6 z-20 w-14 h-14 rounded-full flex items-center justify-center transition-transform hover:scale-110"
+        style={{ background: 'hsl(40 35% 95%)', boxShadow: '0 4px 16px rgba(0,0,0,0.18)' }}>
+        <svg width="40" height="40" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <clipPath id="heart-clip-map">
+              <path d="M50 85 C50 85 10 60 10 32 C10 20 20 12 30 12 C37 12 44 17 50 25 C56 17 63 12 70 12 C80 12 90 20 90 32 C90 60 50 85 50 85Z"/>
+            </clipPath>
+          </defs>
+          <path d="M50 85 C50 85 10 60 10 32 C10 20 20 12 30 12 C37 12 44 17 50 25 C56 17 63 12 70 12 C80 12 90 20 90 32 C90 60 50 85 50 85Z" stroke="hsl(25 30% 15%)" strokeWidth="3" strokeLinejoin="round"/>
+          <line x1="50" y1="28" x2="50" y2="44" stroke="hsl(25 30% 15%)" strokeWidth="3" strokeLinecap="round"/>
+          <line x1="42" y1="36" x2="58" y2="36" stroke="hsl(25 30% 15%)" strokeWidth="3" strokeLinecap="round"/>
+          <g clipPath="url(#heart-clip-map)">
+            <polyline points="14,80 30,55 42,68 54,50 70,68 86,80" stroke="hsl(25 30% 15%)" strokeWidth="2.5" fill="none" strokeLinejoin="round" strokeLinecap="round"/>
+            <line x1="22" y1="80" x2="22" y2="70" stroke="hsl(25 30% 15%)" strokeWidth="2" strokeLinecap="round"/>
+            <polyline points="22,60 16,72 28,72" stroke="hsl(25 30% 15%)" strokeWidth="2" fill="none" strokeLinejoin="round" strokeLinecap="round"/>
+          </g>
         </svg>
       </button>
 
