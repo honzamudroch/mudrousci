@@ -64,10 +64,10 @@ export default function TimelinePage() {
       if (!firstPhoto[p.event_id]) firstPhoto[p.event_id] = p.url
     })
 
-    // Slouč — preferuj event_photos, fallback na photo_url z events
+    // Slouč — photo_url z events je source of truth (uložená hvězdička), fallback na první z event_photos
     const merged = eventsData.map(e => ({
       ...e,
-      photo_url: firstPhoto[e.id] ?? e.photo_url ?? null,
+      photo_url: e.photo_url ?? firstPhoto[e.id] ?? null,
     }))
 
     setEvents(merged)
