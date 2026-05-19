@@ -71,7 +71,7 @@ export default function EventDetail({ event, onClose, onEdit, onDeleted }: Props
         {/* Fotogalerie */}
         {photos.length > 0 ? (
           <div className="relative">
-            <img src={photos[photoIdx]} alt="" className="w-full object-cover" style={{ height: '280px' }} />
+            <img src={photos[photoIdx]} alt="" className="w-full object-contain" style={{ maxHeight: '420px', background: '#111' }} />
             {photos.length > 1 && (
               <>
                 <button onClick={prev}
