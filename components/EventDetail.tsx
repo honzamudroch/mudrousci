@@ -28,6 +28,7 @@ export default function EventDetail({ event, onClose, onEdit, onDeleted }: Props
   const [photoIdx, setPhotoIdx] = useState(0)
   const [confirmDelete, setConfirmDelete] = useState(false)
   const [deleting, setDeleting] = useState(false)
+  const [deletingPhoto, setDeletingPhoto] = useState(false)
   const supabase = createClient()
 
   useEffect(() => {
@@ -47,6 +48,23 @@ export default function EventDetail({ event, onClose, onEdit, onDeleted }: Props
   const formatDate = (d: string) => new Date(d).toLocaleDateString('cs-CZ', { day: 'numeric', month: 'long', year: 'numeric' })
   const prev = () => setPhotoIdx(i => (i - 1 + photos.length) % photos.length)
   const next = () => setPhotoIdx(i => (i + 1) % photos.length)
+
+  const handleDeletePhoto = async () => {
+    if (!event) return
+    setDeletingPhoto(true)
+    const urlToDelete = photos[photoIdx]
+    // Smaž z event_photos
+    await supabase.from('event_photos').delete().eq('url', urlToDelete)
+    // Pokud to byl náhled (photo_url), resetuj na další dostupnou
+    const remaining = photos.filter((_, i) => i !== photoIdx)
+    if (event.photo_url === urlToDelete) {
+      await supabase.from('events').update({ photo_url: remaining[0] ?? null }).eq('id', event.id)
+    }
+    setPhotos(remaining)
+    setPhotoIdx(i => Math.min(i, Math.max(0, remaining.length - 1)))
+    setDeletingPhoto(false)
+    onDeleted?.()
+  }
 
   const handleDelete = async () => {
     setDeleting(true)
@@ -72,6 +90,17 @@ export default function EventDetail({ event, onClose, onEdit, onDeleted }: Props
         {photos.length > 0 ? (
           <div className="relative">
             <img src={photos[photoIdx]} alt="" className="w-full object-contain" style={{ maxHeight: '420px', background: '#111' }} />
+
+            {/* Smazat aktuální fotku */}
+            <button
+              onClick={handleDeletePhoto}
+              disabled={deletingPhoto}
+              className="absolute top-3 left-3 z-10 flex items-center gap-1 px-2.5 py-1 rounded-full font-notes text-xs transition-colors disabled:opacity-50"
+              style={{ background: 'rgba(0,0,0,0.45)', color: 'white' }}
+            >
+              {deletingPhoto ? '…' : '🗑 smazat'}
+            </button>
+
             {photos.length > 1 && (
               <>
                 <button onClick={prev}
