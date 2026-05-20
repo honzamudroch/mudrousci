@@ -174,9 +174,8 @@ export default function MapPage() {
         </svg>
       </button>
 
-      {/* Filtrační lišta — pravý dolní roh */}
-      <div className="absolute z-10 flex flex-col items-end gap-2"
-        style={{ bottom: '16px', right: '12px' }}>
+      {/* Filtrační lišta — desktop: absolute vpravo dole / mobil: fixed nad srdíčkem */}
+      <div className="fixed md:absolute z-10 flex flex-col items-end gap-2 bottom-[116px] right-6 md:bottom-4 md:right-3">
 
         {/* Ikonky filtrů — desktop vždy, mobil jen po rozkliku */}
         {EVENT_TYPES.map(t => {
@@ -205,19 +204,19 @@ export default function MapPage() {
           )
         })}
 
-        {/* Toggle tlačítko — pouze mobil */}
+        {/* Toggle tlačítko — pouze mobil, stejný styl jako srdíčko */}
         <button
           onClick={() => setFiltersOpen(o => !o)}
-          className="md:hidden w-9 h-9 rounded-full flex items-center justify-center transition-all"
+          className="md:hidden w-14 h-14 rounded-full flex items-center justify-center transition-all"
           style={{
-            background: filtersOpen ? 'hsl(25 30% 15%)' : 'rgba(255,255,255,0.92)',
-            border: '1.5px solid rgba(0,0,0,0.12)',
-            boxShadow: '0 1px 4px rgba(0,0,0,0.15)',
-            color: filtersOpen ? 'white' : 'hsl(25 30% 15%)',
-            fontSize: '16px',
+            background: 'hsl(40 35% 95%)',
+            boxShadow: '0 4px 16px rgba(0,0,0,0.18)',
           }}
         >
-          {filtersOpen ? '✕' : '⚙'}
+          {filtersOpen
+            ? <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="hsl(25 30% 15%)" strokeWidth="2.5" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            : <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="hsl(25 30% 15%)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="11" y1="18" x2="13" y2="18"/></svg>
+          }
         </button>
 
       </div>
