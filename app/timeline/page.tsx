@@ -170,7 +170,7 @@ export default function TimelinePage() {
                       {/* Karta */}
                       <div className={`flex w-full ${isLeft ? 'md:justify-start' : 'md:justify-end'}`}>
                         <div
-                          className="paper-card border cursor-pointer p-4 md:p-5 flex flex-col gap-4 max-w-xl w-full md:w-auto transition-transform hover:scale-[1.02] hover:-translate-y-1 relative"
+                          className="paper-card border cursor-pointer p-4 md:p-5 flex flex-col gap-4 max-w-xl w-full transition-transform hover:scale-[1.02] hover:-translate-y-1 relative"
                           style={{
                             borderColor: '#e0e0e0',
                             transform: `rotate(${rotate}deg)`,
