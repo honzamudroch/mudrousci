@@ -73,7 +73,6 @@ export default function MapPage() {
       zoom: 6,
     })
 
-    map.current.addControl(new mapboxgl.NavigationControl(), 'bottom-right')
 
     map.current.on('click', (e) => {
       setPendingCoords({ lat: e.lngLat.lat, lng: e.lngLat.lng })
@@ -177,7 +176,7 @@ export default function MapPage() {
 
       {/* Filtrační lišta — pravý dolní roh */}
       <div className="absolute z-10 flex flex-col items-end gap-2"
-        style={{ bottom: '160px', right: '12px' }}>
+        style={{ bottom: '100px', right: '12px' }}>
 
         {/* Ikonky filtrů — desktop vždy, mobil jen po rozkliku */}
         {EVENT_TYPES.map(t => {
