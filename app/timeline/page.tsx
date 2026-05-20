@@ -190,7 +190,7 @@ export default function TimelinePage() {
                             {/* Pro pravé karty — ikonka vedle fotky */}
                             {isLeft
                               ? <PolaroidPhoto src={event.photo_url} rotate={-rotate * 2} />
-                              : <div className="flex items-start gap-2 shrink-0">
+                              : <div className="flex items-start gap-2 shrink-0 self-center md:self-auto">
                                   <img src={typeInfo.timelineImage} alt="" className="hidden md:block" style={{ width: 75 - (typeInfo.iconPadding ?? 0), height: 75 - (typeInfo.iconPadding ?? 0), objectFit: 'contain', mixBlendMode: 'multiply', filter: 'contrast(1.5)', marginTop: 8 }} />
                                   <PolaroidPhoto src={event.photo_url} rotate={-rotate * 2} />
                                 </div>
