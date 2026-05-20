@@ -38,6 +38,7 @@ export default function MapPage() {
   const [activeFilters, setActiveFilters] = useState<Set<string>>(
     new Set(EVENT_TYPES.map(t => t.id))
   )
+  const [filtersOpen, setFiltersOpen] = useState(false)
   const supabase = createClient()
 
   const filteredEvents = events.filter(e => activeFilters.has(e.type ?? 'rande'))
@@ -174,9 +175,11 @@ export default function MapPage() {
         </svg>
       </button>
 
-      {/* Filtrační lišta — pravý dolní roh, jen ikonky */}
-      <div className="absolute z-10 flex flex-col gap-2 p-2"
+      {/* Filtrační lišta — pravý dolní roh */}
+      <div className="absolute z-10 flex flex-col items-end gap-2"
         style={{ bottom: '100px', right: '12px' }}>
+
+        {/* Ikonky filtrů — desktop vždy, mobil jen po rozkliku */}
         {EVENT_TYPES.map(t => {
           const active = activeFilters.has(t.id)
           return (
@@ -184,7 +187,7 @@ export default function MapPage() {
               key={t.id}
               onClick={() => toggleFilter(t.id)}
               title={t.label}
-              className="w-9 h-9 rounded-full flex items-center justify-center transition-all"
+              className={`w-9 h-9 rounded-full flex items-center justify-center transition-all duration-200 md:flex ${filtersOpen ? 'flex' : 'hidden'}`}
               style={{
                 background: active ? t.color : 'rgba(255,255,255,0.92)',
                 border: `1.5px solid ${active ? t.color : 'rgba(0,0,0,0.12)'}`,
@@ -196,13 +199,28 @@ export default function MapPage() {
                 style={{
                   width: 20, height: 20, objectFit: 'contain',
                   filter: active ? 'brightness(10)' : 'contrast(1.4) brightness(0.3)',
-                  mixBlendMode: 'normal',
                 }}
                 alt={t.label}
               />
             </button>
           )
         })}
+
+        {/* Toggle tlačítko — pouze mobil */}
+        <button
+          onClick={() => setFiltersOpen(o => !o)}
+          className="md:hidden w-9 h-9 rounded-full flex items-center justify-center transition-all"
+          style={{
+            background: filtersOpen ? 'hsl(25 30% 15%)' : 'rgba(255,255,255,0.92)',
+            border: '1.5px solid rgba(0,0,0,0.12)',
+            boxShadow: '0 1px 4px rgba(0,0,0,0.15)',
+            color: filtersOpen ? 'white' : 'hsl(25 30% 15%)',
+            fontSize: '16px',
+          }}
+        >
+          {filtersOpen ? '✕' : '⚙'}
+        </button>
+
       </div>
 
       <div ref={mapContainer} className="flex-1 w-full" />
