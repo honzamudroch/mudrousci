@@ -23,16 +23,12 @@ export default function FotoPage() {
 
   useEffect(() => {
     const load = async () => {
-      const { data: events } = await supabase
-        .from('events')
-        .select('id, title, date')
-        .order('date', { ascending: false })
+      const [{ data: events }, { data: photos }] = await Promise.all([
+        supabase.from('events').select('id, title, date').order('date', { ascending: false }),
+        supabase.from('event_photos').select('url, event_id'),
+      ])
 
       if (!events) { setLoading(false); return }
-
-      const { data: photos } = await supabase
-        .from('event_photos')
-        .select('url, event_id')
 
       const grouped: PhotoGroup[] = events
         .map(event => ({
@@ -113,6 +109,8 @@ export default function FotoPage() {
                     <img
                       src={url}
                       alt=""
+                      loading="lazy"
+                      decoding="async"
                       className="w-full h-full object-cover transition-opacity"
                       style={{ display: 'block' }}
                       onMouseEnter={e => (e.currentTarget.style.opacity = '0.88')}

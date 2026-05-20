@@ -31,7 +31,7 @@ const PolaroidPhoto = ({ src, rotate = 0 }: { src?: string | null; rotate?: numb
     <div className="aspect-square w-full overflow-hidden flex items-center justify-center"
       style={{ background: '#f0f0f0' }}>
       {src
-        ? <img src={src} alt="" className="h-full w-full object-cover" />
+        ? <img src={src} alt="" loading="lazy" decoding="async" className="h-full w-full object-cover" />
         : <span className="font-notes text-sm" style={{ color: 'hsl(25 15% 40%)' }}>foto sem</span>
       }
     </div>
@@ -47,17 +47,12 @@ export default function TimelinePage() {
   const supabase = createClient()
 
   const loadEvents = async () => {
-    const { data: eventsData } = await supabase
-      .from('events')
-      .select('*')
-      .order('date', { ascending: false })
+    const [{ data: eventsData }, { data: photosData }] = await Promise.all([
+      supabase.from('events').select('*').order('date', { ascending: false }),
+      supabase.from('event_photos').select('event_id, url'),
+    ])
 
     if (!eventsData) { setLoading(false); return }
-
-    // Pro každou vzpomínku načti první fotku z event_photos
-    const { data: photosData } = await supabase
-      .from('event_photos')
-      .select('event_id, url')
 
     const firstPhoto: Record<string, string> = {}
     photosData?.forEach(p => {
