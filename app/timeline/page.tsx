@@ -186,7 +186,7 @@ export default function TimelinePage() {
                             }} />
                           )}
 
-                          <div className={`flex flex-col items-center md:items-start ${isLeft ? 'md:flex-row' : 'md:flex-row-reverse'} gap-4`}>
+                          <div className={`flex flex-col items-start ${isLeft ? 'md:flex-row' : 'md:flex-row-reverse'} gap-4`}>
                             {/* Pro pravé karty — ikonka vedle fotky */}
                             {isLeft
                               ? <PolaroidPhoto src={event.photo_url} rotate={-rotate * 2} />
