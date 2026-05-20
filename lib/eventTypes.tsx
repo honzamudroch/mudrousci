@@ -23,7 +23,7 @@ export const EVENT_TYPES: EventType[] = [
     color: '#9b59b6',
     image: '/transparent_kamaradi_icon.png',
     timelineImage: '/transparent_kamaradi_icon.png',
-    iconPadding: 32,
+    iconPadding: 28,
     mapIconSize: 14,
   },
   {
