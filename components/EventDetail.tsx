@@ -26,14 +26,27 @@ interface Props {
 export default function EventDetail({ event, onClose, onEdit, onDeleted }: Props) {
   const [photos, setPhotos] = useState<string[]>([])
   const [photoIdx, setPhotoIdx] = useState(0)
+  const [lightbox, setLightbox] = useState(false)
   const [confirmDelete, setConfirmDelete] = useState(false)
   const [deleting, setDeleting] = useState(false)
   const [deletingPhoto, setDeletingPhoto] = useState(false)
   const supabase = createClient()
 
   useEffect(() => {
+    if (!lightbox) return
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === 'ArrowRight') setPhotoIdx(i => (i + 1) % photos.length)
+      if (e.key === 'ArrowLeft') setPhotoIdx(i => (i - 1 + photos.length) % photos.length)
+      if (e.key === 'Escape') setLightbox(false)
+    }
+    window.addEventListener('keydown', handler)
+    return () => window.removeEventListener('keydown', handler)
+  }, [lightbox, photos.length])
+
+  useEffect(() => {
     if (!event) return
     setPhotoIdx(0)
+    setLightbox(false)
     setConfirmDelete(false)
     supabase.from('event_photos').select('url').eq('event_id', event.id).order('created_at').then(({ data }) => {
       if (data && data.length > 0) setPhotos(data.map(p => p.url))
@@ -89,7 +102,12 @@ export default function EventDetail({ event, onClose, onEdit, onDeleted }: Props
         {/* Fotogalerie */}
         {photos.length > 0 ? (
           <div className="relative">
-            <img src={photos[photoIdx]} alt="" className="w-full object-contain" style={{ maxHeight: '420px', background: '#111' }} />
+            <img
+              src={photos[photoIdx]} alt=""
+              className="w-full object-contain cursor-zoom-in"
+              style={{ maxHeight: '420px', background: '#111' }}
+              onClick={() => setLightbox(true)}
+            />
 
             {/* Smazat aktuální fotku */}
             <button
@@ -188,6 +206,55 @@ export default function EventDetail({ event, onClose, onEdit, onDeleted }: Props
           </div>
         </div>
       </div>
+
+      {/* Fullscreen lightbox */}
+      {lightbox && photos.length > 0 && (
+        <div
+          className="fixed inset-0 z-[70] flex items-center justify-center"
+          style={{ background: 'rgba(0,0,0,0.95)' }}
+          onClick={() => setLightbox(false)}
+        >
+          {/* Zavřít */}
+          <button
+            className="absolute top-4 right-5 z-10 w-10 h-10 rounded-full flex items-center justify-center font-notes text-xl text-white"
+            style={{ background: 'rgba(255,255,255,0.12)' }}
+            onClick={e => { e.stopPropagation(); setLightbox(false) }}
+          >✕</button>
+
+          {/* Šipka vlevo */}
+          {photos.length > 1 && (
+            <button
+              className="absolute left-3 md:left-8 z-10 w-12 h-12 rounded-full flex items-center justify-center text-white text-3xl"
+              style={{ background: 'rgba(255,255,255,0.12)' }}
+              onClick={e => { e.stopPropagation(); setPhotoIdx(i => (i - 1 + photos.length) % photos.length) }}
+            >‹</button>
+          )}
+
+          {/* Fotka */}
+          <img
+            src={photos[photoIdx]}
+            alt=""
+            className="max-h-[92vh] max-w-[92vw] object-contain select-none"
+            onClick={e => e.stopPropagation()}
+          />
+
+          {/* Šipka vpravo */}
+          {photos.length > 1 && (
+            <button
+              className="absolute right-3 md:right-8 z-10 w-12 h-12 rounded-full flex items-center justify-center text-white text-3xl"
+              style={{ background: 'rgba(255,255,255,0.12)' }}
+              onClick={e => { e.stopPropagation(); setPhotoIdx(i => (i + 1) % photos.length) }}
+            >›</button>
+          )}
+
+          {/* Počítadlo */}
+          {photos.length > 1 && (
+            <div className="absolute bottom-5 left-1/2 -translate-x-1/2 font-notes text-xs text-white/50">
+              {photoIdx + 1} / {photos.length}
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Potvrzení smazání */}
       {confirmDelete && (
