@@ -176,7 +176,7 @@ export default function MapPage() {
 
       {/* Filtrační lišta — pravý dolní roh */}
       <div className="absolute z-10 flex flex-col items-end gap-2"
-        style={{ bottom: '100px', right: '12px' }}>
+        style={{ bottom: '16px', right: '12px' }}>
 
         {/* Ikonky filtrů — desktop vždy, mobil jen po rozkliku */}
         {EVENT_TYPES.map(t => {
