@@ -44,9 +44,8 @@ export const EVENT_TYPES: EventType[] = [
     id: 'kultura',
     label: 'Kultura',
     color: '#2980b9',
-    image: '/kultura.png',
-    timelineImage: '/kultura.png',
-    iconPadding: -8,
+    image: '/transparent_kultura_icon.png',
+    timelineImage: '/transparent_kultura_icon.png',
   },
   {
     id: 'cestovani',

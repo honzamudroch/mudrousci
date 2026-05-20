@@ -174,27 +174,32 @@ export default function MapPage() {
         </svg>
       </button>
 
-      {/* Filtrační lišta */}
-      <div className="absolute z-10 flex gap-2 px-3 py-2 overflow-x-auto"
-        style={{ top: '80px', left: 0, right: 0, scrollbarWidth: 'none' }}>
+      {/* Filtrační lišta — pravý dolní roh, jen ikonky */}
+      <div className="absolute z-10 flex flex-col gap-2 p-2"
+        style={{ bottom: '100px', right: '12px' }}>
         {EVENT_TYPES.map(t => {
           const active = activeFilters.has(t.id)
           return (
             <button
               key={t.id}
               onClick={() => toggleFilter(t.id)}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full font-notes text-xs whitespace-nowrap transition-all shrink-0"
+              title={t.label}
+              className="w-9 h-9 rounded-full flex items-center justify-center transition-all"
               style={{
                 background: active ? t.color : 'rgba(255,255,255,0.92)',
-                color: active ? '#fff' : 'hsl(25 15% 40%)',
-                border: `1.5px solid ${active ? t.color : 'rgba(0,0,0,0.1)'}`,
-                boxShadow: '0 1px 4px rgba(0,0,0,0.12)',
+                border: `1.5px solid ${active ? t.color : 'rgba(0,0,0,0.12)'}`,
+                boxShadow: '0 1px 4px rgba(0,0,0,0.15)',
               }}
             >
-              <img src={t.timelineImage}
-                style={{ width: 14, height: 14, objectFit: 'contain', filter: active ? 'brightness(10)' : 'none' }}
-                alt="" />
-              {t.label}
+              <img
+                src={t.timelineImage}
+                style={{
+                  width: 20, height: 20, objectFit: 'contain',
+                  filter: active ? 'brightness(10)' : 'contrast(1.4) brightness(0.3)',
+                  mixBlendMode: 'normal',
+                }}
+                alt={t.label}
+              />
             </button>
           )
         })}
