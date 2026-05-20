@@ -8,7 +8,7 @@ import 'mapbox-gl/dist/mapbox-gl.css'
 import { createClient } from '@/lib/supabase'
 import AddEventModal from '@/components/AddEventModal'
 import EventDetail from '@/components/EventDetail'
-import { createMarkerHTML, getType } from '@/lib/eventTypes'
+import { createMarkerHTML, getType, EVENT_TYPES } from '@/lib/eventTypes'
 
 interface Event {
   id: string
@@ -35,7 +35,25 @@ export default function MapPage() {
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null)
   const [clusterEvents, setClusterEvents] = useState<Event[] | null>(null)
   const [events, setEvents] = useState<Event[]>([])
+  const [activeFilters, setActiveFilters] = useState<Set<string>>(
+    new Set(EVENT_TYPES.map(t => t.id))
+  )
   const supabase = createClient()
+
+  const filteredEvents = events.filter(e => activeFilters.has(e.type ?? 'rande'))
+
+  const toggleFilter = (id: string) => {
+    setActiveFilters(prev => {
+      const next = new Set(prev)
+      if (next.has(id)) {
+        if (next.size === 1) return prev // aspoň jeden musí zůstat
+        next.delete(id)
+      } else {
+        next.add(id)
+      }
+      return next
+    })
+  }
 
   const loadEvents = useCallback(async () => {
     const { data } = await supabase.from('events').select('*').order('date', { ascending: false })
@@ -73,7 +91,7 @@ export default function MapPage() {
 
     // Seskup eventy podle zaokrouhlených souřadnic
     const groups: Record<string, Event[]> = {}
-    events.forEach(event => {
+    filteredEvents.forEach(event => {
       const key = `${roundCoord(event.lat)}_${roundCoord(event.lng)}`
       if (!groups[key]) groups[key] = []
       groups[key].push(event)
@@ -117,7 +135,7 @@ export default function MapPage() {
 
       markersRef.current.push(marker)
     })
-  }, [events])
+  }, [filteredEvents])
 
   const pluralVzpominka = (n: number) => {
     if (n === 1) return 'vzpomínka'
@@ -128,7 +146,7 @@ export default function MapPage() {
   const formatDate = (d: string) => new Date(d).toLocaleDateString('cs-CZ', { day: 'numeric', month: 'short', year: 'numeric' })
 
   return (
-    <div className="flex flex-col w-full h-screen">
+    <div className="flex flex-col w-full h-screen relative">
 
       <Header countLabel={`${events.length} ${pluralVzpominka(events.length)}`} />
 
@@ -155,6 +173,32 @@ export default function MapPage() {
           </g>
         </svg>
       </button>
+
+      {/* Filtrační lišta */}
+      <div className="absolute z-10 flex gap-2 px-3 py-2 overflow-x-auto"
+        style={{ top: '80px', left: 0, right: 0, scrollbarWidth: 'none' }}>
+        {EVENT_TYPES.map(t => {
+          const active = activeFilters.has(t.id)
+          return (
+            <button
+              key={t.id}
+              onClick={() => toggleFilter(t.id)}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full font-notes text-xs whitespace-nowrap transition-all shrink-0"
+              style={{
+                background: active ? t.color : 'rgba(255,255,255,0.92)',
+                color: active ? '#fff' : 'hsl(25 15% 40%)',
+                border: `1.5px solid ${active ? t.color : 'rgba(0,0,0,0.1)'}`,
+                boxShadow: '0 1px 4px rgba(0,0,0,0.12)',
+              }}
+            >
+              <img src={t.timelineImage}
+                style={{ width: 14, height: 14, objectFit: 'contain', filter: active ? 'brightness(10)' : 'none' }}
+                alt="" />
+              {t.label}
+            </button>
+          )
+        })}
+      </div>
 
       <div ref={mapContainer} className="flex-1 w-full" />
 
