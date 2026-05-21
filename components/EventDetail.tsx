@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase'
 import { getType } from '@/lib/eventTypes'
+import { thumbUrl } from '@/lib/imageUtils'
 
 interface Event {
   id: string
@@ -103,7 +104,8 @@ export default function EventDetail({ event, onClose, onEdit, onDeleted }: Props
         {photos.length > 0 ? (
           <div className="relative">
             <img
-              src={photos[photoIdx]} alt=""
+              src={thumbUrl(photos[photoIdx], 800)}
+              alt=""
               className="w-full object-contain cursor-zoom-in"
               style={{ maxHeight: '420px', background: '#111' }}
               onClick={() => setLightbox(true)}
@@ -231,12 +233,19 @@ export default function EventDetail({ event, onClose, onEdit, onDeleted }: Props
           )}
 
           {/* Fotka */}
-          <img
-            src={photos[photoIdx]}
-            alt=""
-            className="max-h-[92vh] max-w-[92vw] object-contain select-none"
-            onClick={e => e.stopPropagation()}
-          />
+          <div className="relative select-none" onClick={e => e.stopPropagation()}>
+            <img
+              src={thumbUrl(photos[photoIdx], 40, 60)}
+              alt=""
+              className="max-h-[92vh] max-w-[92vw] object-contain absolute inset-0 w-full h-full"
+              style={{ filter: 'blur(12px)', transform: 'scale(1.05)' }}
+            />
+            <img
+              src={photos[photoIdx]}
+              alt=""
+              className="max-h-[92vh] max-w-[92vw] object-contain relative"
+            />
+          </div>
 
           {/* Šipka vpravo */}
           {photos.length > 1 && (

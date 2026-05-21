@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase'
 import Header from '@/components/Header'
+import { thumbUrl } from '@/lib/imageUtils'
 
 interface PhotoGroup {
   date: string
@@ -107,7 +108,7 @@ export default function FotoPage() {
                     onClick={() => openLightbox(groupIdx, i)}
                   >
                     <img
-                      src={url}
+                      src={thumbUrl(url, 400)}
                       alt=""
                       loading="lazy"
                       decoding="async"
@@ -148,14 +149,21 @@ export default function FotoPage() {
             >‹</button>
           )}
 
-          {/* Foto */}
-          <img
-            src={lightbox.url}
-            alt=""
-            className="max-h-[90vh] max-w-[90vw] object-contain"
-            style={{ borderRadius: '2px' }}
-            onClick={e => e.stopPropagation()}
-          />
+          {/* Foto — blur thumbnail jako placeholder, originál se načte přes */}
+          <div className="relative" onClick={e => e.stopPropagation()}>
+            <img
+              src={thumbUrl(lightbox.url, 40, 60)}
+              alt=""
+              className="max-h-[90vh] max-w-[90vw] object-contain absolute inset-0 w-full h-full"
+              style={{ filter: 'blur(12px)', transform: 'scale(1.05)' }}
+            />
+            <img
+              src={lightbox.url}
+              alt=""
+              className="max-h-[90vh] max-w-[90vw] object-contain relative"
+              style={{ borderRadius: '2px' }}
+            />
+          </div>
 
           {/* Další */}
           {lightbox.idx < groups[lightbox.groupIdx].photos.length - 1 && (

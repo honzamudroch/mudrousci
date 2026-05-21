@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect, useCallback } from 'react'
 import { createClient } from '@/lib/supabase'
 import { EVENT_TYPES } from '@/lib/eventTypes'
+import { compressImage } from '@/lib/imageUtils'
 
 interface Event {
   id: string
@@ -171,9 +172,8 @@ export default function AddEventModal({ coords, editEvent, onClose, onSaved }: P
       const uploadedUrls: string[] = []
       const previewToFinal: Record<string, string> = {}
       for (let i = 0; i < files.length; i++) {
-        const file = files[i]
-        const ext = file.name.split('.').pop()
-        const filename = `${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`
+        const file = await compressImage(files[i]) // komprese před uploadem
+        const filename = `${Date.now()}_${Math.random().toString(36).slice(2)}.jpg`
         const { data: storData, error: storErr } = await supabase.storage.from('photos').upload(filename, file)
         if (storErr) { console.error('Upload error:', storErr); continue }
         if (storData) {
