@@ -208,17 +208,11 @@ export default function EventDetail({ event, onClose, onEdit, onDeleted }: Props
           )}
 
           {/* Fotka */}
-          <div className="relative select-none" onClick={e => e.stopPropagation()}>
-            <img
-              src={thumbUrl(photos[photoIdx], 40, 60)}
-              alt=""
-              className="max-h-[92vh] max-w-[92vw] object-contain absolute inset-0 w-full h-full"
-              style={{ filter: 'blur(12px)', transform: 'scale(1.05)' }}
-            />
+          <div onClick={e => e.stopPropagation()}>
             <img
               src={photos[photoIdx]}
               alt=""
-              className="max-h-[92vh] max-w-[92vw] object-contain relative"
+              className="max-h-[92vh] max-w-[92vw] object-contain"
             />
           </div>
 

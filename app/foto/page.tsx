@@ -149,18 +149,12 @@ export default function FotoPage() {
             >‹</button>
           )}
 
-          {/* Foto — blur thumbnail jako placeholder, originál se načte přes */}
-          <div className="relative" onClick={e => e.stopPropagation()}>
-            <img
-              src={thumbUrl(lightbox.url, 40, 60)}
-              alt=""
-              className="max-h-[90vh] max-w-[90vw] object-contain absolute inset-0 w-full h-full"
-              style={{ filter: 'blur(12px)', transform: 'scale(1.05)' }}
-            />
+          {/* Foto */}
+          <div onClick={e => e.stopPropagation()}>
             <img
               src={lightbox.url}
               alt=""
-              className="max-h-[90vh] max-w-[90vw] object-contain relative"
+              className="max-h-[90vh] max-w-[90vw] object-contain"
               style={{ borderRadius: '2px' }}
             />
           </div>
