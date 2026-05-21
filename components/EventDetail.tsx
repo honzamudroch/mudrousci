@@ -86,12 +86,12 @@ export default function EventDetail({ event, onClose, onEdit, onDeleted }: Props
 
         {/* Fotogalerie */}
         {photos.length > 0 ? (
-          <div className="relative">
+          <div className="relative" style={{ background: '#111', display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '160px' }}>
             <img
               src={thumbUrl(photos[photoIdx], 800)}
               alt=""
-              className="w-full object-contain cursor-zoom-in"
-              style={{ maxHeight: '420px', background: '#111' }}
+              className="cursor-zoom-in block"
+              style={{ maxWidth: '100%', maxHeight: '420px', objectFit: 'contain' }}
               onClick={() => setLightbox(true)}
             />
 

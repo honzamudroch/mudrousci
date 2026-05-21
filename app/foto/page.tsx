@@ -103,19 +103,19 @@ export default function FotoPage() {
                 {group.photos.map((url, i) => (
                   <div
                     key={i}
-                    className="cursor-pointer overflow-hidden"
-                    style={{ aspectRatio: '1 / 1' }}
+                    className="cursor-pointer overflow-hidden flex items-center justify-center"
+                    style={{ aspectRatio: '1 / 1', background: '#f0f0f0' }}
                     onClick={() => openLightbox(groupIdx, i)}
+                    onMouseEnter={e => (e.currentTarget.querySelector('img')!.style.opacity = '0.88')}
+                    onMouseLeave={e => (e.currentTarget.querySelector('img')!.style.opacity = '1')}
                   >
                     <img
                       src={thumbUrl(url, 400)}
                       alt=""
                       loading="lazy"
                       decoding="async"
-                      className="w-full h-full object-cover transition-opacity"
-                      style={{ display: 'block' }}
-                      onMouseEnter={e => (e.currentTarget.style.opacity = '0.88')}
-                      onMouseLeave={e => (e.currentTarget.style.opacity = '1')}
+                      className="transition-opacity"
+                      style={{ display: 'block', maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }}
                     />
                   </div>
                 ))}
