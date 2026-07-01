@@ -11,8 +11,7 @@ export default function Header({ countLabel }: { countLabel?: string } = {}) {
   const [menuOpen, setMenuOpen] = useState(false)
 
   const handleLogout = () => {
-    supabase.auth.signOut()
-    window.location.href = '/login'
+    window.location.href = '/api/logout'
   }
 
   const linkClass = (path: string) => {
