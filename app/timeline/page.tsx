@@ -48,6 +48,7 @@ export default function TimelinePage() {
   const supabase = createClient()
 
   const loadEvents = async () => {
+    try {
     const [{ data: eventsData }, { data: photosData }] = await Promise.all([
       supabase.from('events').select('*').order('date', { ascending: false }),
       supabase.from('event_photos').select('event_id, url'),
@@ -68,6 +69,10 @@ export default function TimelinePage() {
 
     setEvents(merged)
     setLoading(false)
+    } catch (e) {
+      console.error('loadEvents error:', e)
+      setLoading(false)
+    }
   }
 
   useEffect(() => { loadEvents() }, [])

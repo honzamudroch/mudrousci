@@ -24,25 +24,30 @@ export default function FotoPage() {
 
   useEffect(() => {
     const load = async () => {
-      const [{ data: events }, { data: photos }] = await Promise.all([
-        supabase.from('events').select('id, title, date').order('date', { ascending: false }),
-        supabase.from('event_photos').select('url, event_id'),
-      ])
+      try {
+        const [{ data: events }, { data: photos }] = await Promise.all([
+          supabase.from('events').select('id, title, date').order('date', { ascending: false }),
+          supabase.from('event_photos').select('url, event_id'),
+        ])
 
-      if (!events) { setLoading(false); return }
+        if (!events) { setLoading(false); return }
 
-      const grouped: PhotoGroup[] = events
-        .map(event => ({
-          date: event.date,
-          title: event.title,
-          photos: (photos ?? [])
-            .filter(p => p.event_id === event.id)
-            .map(p => p.url),
-        }))
-        .filter(g => g.photos.length > 0)
+        const grouped: PhotoGroup[] = events
+          .map(event => ({
+            date: event.date,
+            title: event.title,
+            photos: (photos ?? [])
+              .filter(p => p.event_id === event.id)
+              .map(p => p.url),
+          }))
+          .filter(g => g.photos.length > 0)
 
-      setGroups(grouped)
-      setLoading(false)
+        setGroups(grouped)
+        setLoading(false)
+      } catch (e) {
+        console.error('load error:', e)
+        setLoading(false)
+      }
     }
     load()
   }, [])
