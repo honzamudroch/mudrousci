@@ -11,7 +11,8 @@ export function thumbUrl(
 ): string {
   if (!url) return ''
   if (!url.includes('/storage/v1/object/public/')) return url
-  let params = `?width=${width}&quality=${quality}`
+  const apikey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? ''
+  let params = `?width=${width}&quality=${quality}&apikey=${apikey}`
   if (height !== undefined) params += `&height=${height}`
   return (
     url.replace('/storage/v1/object/public/', '/storage/v1/render/image/public/') + params
