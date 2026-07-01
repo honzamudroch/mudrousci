@@ -3,20 +3,16 @@
  * Endpoint /render/image/public/ resizuje obrázek server-side — vrací WebP.
  * Funguje zdarma na všech Supabase planech.
  */
+// Supabase Image Transform (render/image) vrací 403 na free plánu → vracíme original URL
+// Fotky jsou komprimované canvas API při uploadu (~350KB), takže je to OK
 export function thumbUrl(
   url: string | null | undefined,
-  width: number,
-  quality = 75,
-  height?: number
+  _width?: number,
+  _quality?: number,
+  _height?: number
 ): string {
   if (!url) return ''
-  if (!url.includes('/storage/v1/object/public/')) return url
-  const apikey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? ''
-  let params = `?width=${width}&quality=${quality}&apikey=${apikey}`
-  if (height !== undefined) params += `&height=${height}`
-  return (
-    url.replace('/storage/v1/object/public/', '/storage/v1/render/image/public/') + params
-  )
+  return url
 }
 
 /**
