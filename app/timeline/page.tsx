@@ -72,8 +72,8 @@ export default function TimelinePage() {
 
     setEvents(merged)
     setLoading(false)
-    } catch (e) {
-      console.error('loadEvents error:', e)
+    } catch (e: any) {
+      setDebugInfo(`ERROR: ${e?.message ?? String(e)}`)
       setLoading(false)
     }
   }
@@ -130,11 +130,9 @@ export default function TimelinePage() {
           </div>
         </div>
 
-        {debugInfo && (
-          <p className="mt-4 text-center font-notes text-xs p-2 rounded" style={{ background: '#f0f0f0', color: '#333' }}>
-            🔍 {debugInfo}
-          </p>
-        )}
+        <p className="mt-4 text-center font-notes text-xs p-2 rounded" style={{ background: '#f0f0f0', color: '#333' }}>
+          🔍 {debugInfo || 'loading...'}
+        </p>
 
         {loading && (
           <p className="mt-12 text-center font-notes" style={{ color: 'hsl(25 15% 40%)' }}>
