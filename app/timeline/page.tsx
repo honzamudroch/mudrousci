@@ -57,12 +57,12 @@ export default function TimelinePage() {
     if (!eventsData) { setLoading(false); return }
 
     const firstPhoto: Record<string, string> = {}
-    photosData?.forEach(p => {
+    ;(photosData as { event_id: string; url: string }[] | null)?.forEach(p => {
       if (!firstPhoto[p.event_id]) firstPhoto[p.event_id] = p.url
     })
 
     // Slouč — photo_url z events je source of truth (uložená hvězdička), fallback na první z event_photos
-    const merged = eventsData.map(e => ({
+    const merged = (eventsData as Event[]).map(e => ({
       ...e,
       photo_url: e.photo_url ?? firstPhoto[e.id] ?? null,
     }))

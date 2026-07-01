@@ -33,14 +33,14 @@ export default function FotoPage() {
         if (!events) { setLoading(false); return }
 
         const grouped: PhotoGroup[] = events
-          .map(event => ({
+          .map((event: { id: string; title: string; date: string }) => ({
             date: event.date,
             title: event.title,
             photos: (photos ?? [])
-              .filter(p => p.event_id === event.id)
-              .map(p => p.url),
+              .filter((p: { event_id: string; url: string }) => p.event_id === event.id)
+              .map((p: { event_id: string; url: string }) => p.url),
           }))
-          .filter(g => g.photos.length > 0)
+          .filter((g: PhotoGroup) => g.photos.length > 0)
 
         setGroups(grouped)
         setLoading(false)

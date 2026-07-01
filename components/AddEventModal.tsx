@@ -107,7 +107,7 @@ export default function AddEventModal({ coords, editEvent, onClose, onSaved }: P
 
   useEffect(() => {
     if (isEdit && editEvent) {
-      supabase.from('event_photos').select('*').eq('event_id', editEvent.id).then(({ data }) => {
+      supabase.from('event_photos').select('*').eq('event_id', editEvent.id).then(({ data }: { data: any[] | null }) => {
         if (data) {
           setExistingPhotos(data)
           if (data.length > 0 && !primaryUrl) {

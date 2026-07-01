@@ -49,7 +49,7 @@ export default function EventDetail({ event, onClose, onEdit, onDeleted }: Props
     setPhotoIdx(0)
     setLightbox(false)
     setConfirmDelete(false)
-    supabase.from('event_photos').select('url').eq('event_id', event.id).order('created_at').then(({ data }) => {
+    supabase.from('event_photos').select('url').eq('event_id', event.id).order('created_at').then(({ data }: { data: { url: string }[] | null }) => {
       if (data && data.length > 0) setPhotos(data.map(p => p.url))
       else if (event.photo_url) setPhotos([event.photo_url])
       else setPhotos([])
