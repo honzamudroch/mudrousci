@@ -12,7 +12,7 @@ export default function Header({ countLabel }: { countLabel?: string } = {}) {
 
   const handleLogout = async () => {
     await supabase.auth.signOut()
-    router.push('/login')
+    window.location.href = '/login'
   }
 
   const linkClass = (path: string) => {
