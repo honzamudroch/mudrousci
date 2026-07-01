@@ -45,14 +45,17 @@ export default function TimelinePage() {
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null)
   const [editEvent, setEditEvent] = useState<Event | null>(null)
   const [showEdit, setShowEdit] = useState(false)
+  const [debugInfo, setDebugInfo] = useState('')
   const supabase = createClient()
 
   const loadEvents = async () => {
     try {
-    const [{ data: eventsData }, { data: photosData }] = await Promise.all([
+    const { data: { user } } = await supabase.auth.getUser()
+    const [{ data: eventsData, error: eventsError }, { data: photosData }] = await Promise.all([
       supabase.from('events').select('*').order('date', { ascending: false }),
       supabase.from('event_photos').select('event_id, url'),
     ])
+    setDebugInfo(`user: ${user?.email ?? 'null'} | events: ${eventsData?.length ?? 'null'} | err: ${eventsError?.message ?? 'none'}`)
 
     if (!eventsData) { setLoading(false); return }
 
@@ -126,6 +129,12 @@ export default function TimelinePage() {
             <span className="font-hand" style={{ fontSize: '1.2rem', color: 'hsl(25 30% 15%)', marginTop: '-8px' }}>nový zážitek</span>
           </div>
         </div>
+
+        {debugInfo && (
+          <p className="mt-4 text-center font-notes text-xs p-2 rounded" style={{ background: '#f0f0f0', color: '#333' }}>
+            🔍 {debugInfo}
+          </p>
+        )}
 
         {loading && (
           <p className="mt-12 text-center font-notes" style={{ color: 'hsl(25 15% 40%)' }}>
