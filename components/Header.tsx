@@ -10,8 +10,8 @@ export default function Header({ countLabel }: { countLabel?: string } = {}) {
   const supabase = createClient()
   const [menuOpen, setMenuOpen] = useState(false)
 
-  const handleLogout = async () => {
-    await supabase.auth.signOut()
+  const handleLogout = () => {
+    supabase.auth.signOut()
     window.location.href = '/login'
   }
 
