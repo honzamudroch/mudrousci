@@ -5,12 +5,17 @@
  */
 export function thumbUrl(
   url: string | null | undefined,
-  _width?: number,
-  _quality?: number,
-  _height?: number
+  width: number,
+  quality = 75,
+  height?: number
 ): string {
   if (!url) return ''
-  return url
+  if (!url.includes('/storage/v1/object/public/')) return url
+  let params = `?width=${width}&quality=${quality}`
+  if (height !== undefined) params += `&height=${height}`
+  return (
+    url.replace('/storage/v1/object/public/', '/storage/v1/render/image/public/') + params
+  )
 }
 
 /**
