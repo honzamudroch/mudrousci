@@ -242,7 +242,7 @@ export default function AddEventModal({ coords, editEvent, onClose, onSaved }: P
 
             {/* Vyhledávání místa — nahrazuje GPS pole */}
             <div className="relative">
-              <Label>Místo na mapě</Label>
+              <Label>Poloha na mapě</Label>
               <div className="relative">
                 <input
                   type="text"
