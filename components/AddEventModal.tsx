@@ -75,6 +75,21 @@ export default function AddEventModal({ coords, editEvent, onClose, onSaved }: P
     setGeoPicked(false)
     if (geoTimeout.current) clearTimeout(geoTimeout.current)
     if (q.trim().length < 2) { setGeoResults([]); return }
+
+    // Přímé zadání GPS souřadnic ve formátu "50.0755, 14.4378"
+    const coordMatch = q.trim().match(/^(-?\d+\.?\d*)[,\s]+(-?\d+\.?\d*)$/)
+    if (coordMatch) {
+      const lat = parseFloat(coordMatch[1])
+      const lng = parseFloat(coordMatch[2])
+      if (lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180) {
+        setManualLat(lat.toFixed(6))
+        setManualLng(lng.toFixed(6))
+        setGeoResults([])
+        setGeoPicked(true)
+        return
+      }
+    }
+
     geoTimeout.current = setTimeout(async () => {
       setGeoLoading(true)
       try {
