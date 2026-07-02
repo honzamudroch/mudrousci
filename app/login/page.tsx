@@ -21,7 +21,7 @@ export default function LoginPage() {
       setError('Zkus to ještě jednou, prosím.')
       setLoading(false)
     } else {
-      router.push('/home')
+      window.location.href = '/home'
     }
   }
 
