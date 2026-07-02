@@ -156,7 +156,7 @@ export default function AddEventModal({ coords, editEvent, onClose, onSaved }: P
 
       if (isEdit) {
         const { error } = await supabase.from('events')
-          .update({ title, description, date, type, location_name: locationName })
+          .update({ title, description, date, type, location_name: locationName, lat, lng })
           .eq('id', editEvent!.id)
         if (error) throw error
       } else {
