@@ -76,6 +76,26 @@ export default function AddEventModal({ coords, editEvent, onClose, onSaved }: P
     if (geoTimeout.current) clearTimeout(geoTimeout.current)
     if (q.trim().length < 2) { setGeoResults([]); return }
 
+    // Formát se světovými stranami: "48,04576° S, 10,59950° V" nebo "48.04576° N, 10.59950° E"
+    const degDirMatch = q.trim().match(/^(\d+)[,.](\d+)°?\s*([SNJsnj])\s*[,;]?\s*(\d+)[,.](\d+)°?\s*([VZEWvzew])/i)
+    if (degDirMatch) {
+      const lat = parseFloat(`${degDirMatch[1]}.${degDirMatch[2]}`)
+      const lng = parseFloat(`${degDirMatch[4]}.${degDirMatch[5]}`)
+      const latDir = degDirMatch[3].toUpperCase()
+      const lngDir = degDirMatch[6].toUpperCase()
+      // V/Z = česky (S=Sever=North, J=Jih=South); E/W = anglicky (N=North, S=South)
+      const isCzech = lngDir === 'V' || lngDir === 'Z'
+      const finalLat = isCzech ? (latDir === 'J' ? -lat : lat) : (latDir === 'S' ? -lat : lat)
+      const finalLng = (lngDir === 'Z' || lngDir === 'W') ? -lng : lng
+      if (finalLat >= -90 && finalLat <= 90 && finalLng >= -180 && finalLng <= 180) {
+        setManualLat(finalLat.toFixed(6))
+        setManualLng(finalLng.toFixed(6))
+        setGeoResults([])
+        setGeoPicked(true)
+        return
+      }
+    }
+
     // Přímé zadání GPS souřadnic ve formátu "50.0755, 14.4378"
     const coordMatch = q.trim().match(/^(-?\d+\.?\d*)[,\s]+(-?\d+\.?\d*)$/)
     if (coordMatch) {
