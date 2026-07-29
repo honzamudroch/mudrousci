@@ -15,7 +15,7 @@ export default function Header({ countLabel }: { countLabel?: string } = {}) {
   }
 
   const linkClass = (path: string) => {
-    const active = pathname === path
+    const active = pathname === path || (path === '/cile' && pathname.startsWith('/cile/'))
     return active
       ? 'font-hand text-2xl transition-colors ink-underline'
       : 'font-hand text-2xl transition-colors hover:opacity-60'
@@ -61,6 +61,10 @@ export default function Header({ countLabel }: { countLabel?: string } = {}) {
           <button onClick={() => router.push('/foto')} className={linkClass('/foto')}
             style={{color: 'hsl(25 30% 15%)'}}>
             Foto
+          </button>
+          <button onClick={() => router.push('/cile')} className={linkClass('/cile')}
+            style={{color: 'hsl(25 30% 15%)'}}>
+            Cíle
           </button>
           <button onClick={handleLogout}
             className="font-notes text-sm underline decoration-dotted"
@@ -112,6 +116,10 @@ export default function Header({ countLabel }: { countLabel?: string } = {}) {
           <button onClick={() => { router.push('/foto'); setMenuOpen(false) }}
             className={linkClass('/foto')} style={{color: 'hsl(25 30% 15%)', textAlign: 'left'}}>
             Foto
+          </button>
+          <button onClick={() => { router.push('/cile'); setMenuOpen(false) }}
+            className={linkClass('/cile')} style={{color: 'hsl(25 30% 15%)', textAlign: 'left'}}>
+            Cíle
           </button>
           <button onClick={handleLogout}
             className="font-notes text-sm underline decoration-dotted text-left"
