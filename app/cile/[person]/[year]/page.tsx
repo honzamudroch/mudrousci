@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase'
 import Header from '@/components/Header'
-import GoalCard from '@/components/GoalCard'
+import GoalDetailModal from '@/components/GoalDetailModal'
 import AddGoalModal from '@/components/AddGoalModal'
 
 interface Goal {
@@ -15,6 +15,12 @@ interface Goal {
 interface GoalTask {
   id: string; goal_id: string; title: string
   deadline: string | null; status: 'todo' | 'in-progress' | 'done'; order_idx: number
+}
+
+const STATUS_BORDER = {
+  'todo':        '#c8b9a8',
+  'in-progress': 'hsl(38 80% 55%)',
+  'done':        'hsl(145 40% 48%)',
 }
 
 const LABELS: Record<string, string> = { honza: 'Honza', lucka: 'Lucka' }
@@ -28,12 +34,12 @@ export default function GoalsPage() {
   const [goals, setGoals] = useState<Goal[]>([])
   const [tasks, setTasks] = useState<GoalTask[]>([])
   const [loading, setLoading] = useState(true)
+  const [selectedGoal, setSelectedGoal] = useState<Goal | null>(null)
   const [showAddGoal, setShowAddGoal] = useState(false)
   const [editGoal, setEditGoal] = useState<Goal | null>(null)
   const supabase = createClient()
 
   const loadData = async () => {
-    const goalIds = goals.map(g => g.id)
     const [{ data: goalsData }, { data: tasksData }] = await Promise.all([
       supabase.from('goals').select('*').eq('person', person).eq('year', year).order('order_idx'),
       supabase.from('goal_tasks').select('*').order('order_idx'),
@@ -44,22 +50,6 @@ export default function GoalsPage() {
   }
 
   useEffect(() => { loadData() }, [])
-
-  const moveGoal = async (goalId: string, dir: 'up' | 'down') => {
-    const idx = goals.findIndex(g => g.id === goalId)
-    const swapIdx = dir === 'up' ? idx - 1 : idx + 1
-    if (swapIdx < 0 || swapIdx >= goals.length) return
-    const a = goals[idx], b = goals[swapIdx]
-    const updated = [...goals]
-    updated[idx] = { ...a, order_idx: b.order_idx }
-    updated[swapIdx] = { ...b, order_idx: a.order_idx }
-    ;[updated[idx], updated[swapIdx]] = [updated[swapIdx], updated[idx]]
-    setGoals(updated)
-    await Promise.all([
-      supabase.from('goals').update({ order_idx: b.order_idx }).eq('id', a.id),
-      supabase.from('goals').update({ order_idx: a.order_idx }).eq('id', b.id),
-    ])
-  }
 
   const personLabel = LABELS[person] ?? person
 
@@ -100,22 +90,65 @@ export default function GoalsPage() {
           </div>
         )}
 
-        <div className="space-y-3">
-          {goals.map((goal, i) => (
-            <GoalCard
-              key={goal.id}
-              goal={goal}
-              tasks={tasks.filter(t => t.goal_id === goal.id)}
-              isFirst={i === 0}
-              isLast={i === goals.length - 1}
-              onMove={dir => moveGoal(goal.id, dir)}
-              onEdit={() => { setEditGoal(goal); setShowAddGoal(true) }}
-              onDeleted={loadData}
-              onTasksChanged={loadData}
-            />
-          ))}
+        {/* Grid dlaždic */}
+        <div className="grid gap-4" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))' }}>
+          {goals.map(goal => {
+            const borderColor = STATUS_BORDER[goal.status]
+            return (
+              <div
+                key={goal.id}
+                className="cursor-pointer transition-transform hover:scale-[1.04] hover:-translate-y-0.5"
+                style={{
+                  border: `3px solid ${borderColor}`,
+                  borderRadius: 14,
+                  overflow: 'hidden',
+                  background: '#fff',
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
+                }}
+                onClick={() => setSelectedGoal(goal)}
+              >
+                {/* Obrázek */}
+                <div style={{
+                  aspectRatio: '1 / 1',
+                  background: 'hsl(38 35% 93%)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                }}>
+                  {goal.image_url ? (
+                    <img src={goal.image_url} alt=""
+                      style={{ width: '100%', height: '100%', objectFit: 'contain', padding: 10 }} />
+                  ) : (
+                    <span style={{ fontSize: '2.5rem' }}>🎯</span>
+                  )}
+                </div>
+
+                {/* Název */}
+                <div className="px-3 py-2.5" style={{ borderTop: `2px solid ${borderColor}20` }}>
+                  <p className="font-hand leading-tight" style={{ fontSize: '1.05rem', color: 'hsl(25 30% 15%)' }}>
+                    {goal.title}
+                  </p>
+                  <p className="font-notes text-xs mt-0.5" style={{ color: 'hsl(25 15% 55%)' }}>
+                    {tasks.filter(t => t.goal_id === goal.id).length} podcílů
+                    {tasks.filter(t => t.goal_id === goal.id && t.status === 'done').length > 0 &&
+                      ` · ${tasks.filter(t => t.goal_id === goal.id && t.status === 'done').length} hotovo`}
+                  </p>
+                </div>
+              </div>
+            )
+          })}
         </div>
       </main>
+
+      {/* Detail modal */}
+      {selectedGoal && (
+        <GoalDetailModal
+          goal={selectedGoal}
+          tasks={tasks.filter(t => t.goal_id === selectedGoal.id)}
+          onClose={() => setSelectedGoal(null)}
+          onEdit={() => { setEditGoal(selectedGoal); setShowAddGoal(true); setSelectedGoal(null) }}
+          onDeleted={() => { setSelectedGoal(null); loadData() }}
+          onTasksChanged={loadData}
+        />
+      )}
 
       {showAddGoal && (
         <AddGoalModal
