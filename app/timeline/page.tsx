@@ -1,12 +1,12 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import Image from 'next/image'
 import { createClient } from '@/lib/supabase'
 import EventDetail from '@/components/EventDetail'
 import AddEventModal from '@/components/AddEventModal'
 import Header from '@/components/Header'
 import { getType } from '@/lib/eventTypes'
-import { thumbUrl } from '@/lib/imageUtils'
 
 interface Event {
   id: string
@@ -29,10 +29,10 @@ const PolaroidPhoto = ({ src, rotate = 0 }: { src?: string | null; rotate?: numb
     className="polaroid inline-block w-44 shrink-0 self-center md:self-auto"
     style={{ transform: `rotate(${rotate}deg)` }}
   >
-    <div className="aspect-square w-full overflow-hidden flex items-center justify-center"
+    <div className="aspect-square w-full overflow-hidden flex items-center justify-center relative"
       style={{ background: '#f0f0f0' }}>
       {src
-        ? <img src={thumbUrl(src, 400, 75, 400)} alt="" loading="lazy" decoding="async" className="h-full w-full object-cover" />
+        ? <Image src={src} alt="" fill sizes="176px" style={{ objectFit: 'cover' }} />
         : <span className="font-notes text-sm" style={{ color: 'hsl(25 15% 40%)' }}>foto sem</span>
       }
     </div>

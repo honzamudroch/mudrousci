@@ -1,9 +1,9 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import Image from 'next/image'
 import { createClient } from '@/lib/supabase'
 import Header from '@/components/Header'
-import { thumbUrl } from '@/lib/imageUtils'
 
 interface PhotoGroup {
   date: string
@@ -112,13 +112,13 @@ export default function FotoPage() {
                     style={{ aspectRatio: '1 / 1', background: '#f0f0f0', position: 'relative' }}
                     onClick={() => openLightbox(groupIdx, i)}
                   >
-                    <img
-                      src={thumbUrl(url, 400, 75, 400)}
+                    <Image
+                      src={url}
                       alt=""
-                      loading="lazy"
-                      decoding="async"
+                      fill
+                      sizes="(max-width: 640px) 50vw, (max-width: 1024px) 25vw, 200px"
                       className="transition-opacity hover:opacity-[0.88]"
-                      style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }}
+                      style={{ objectFit: 'cover' }}
                     />
                   </div>
                 ))}
