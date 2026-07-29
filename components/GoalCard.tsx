@@ -25,7 +25,7 @@ const STATUS = {
   'done':        { label: 'Hotovo ✓', color: 'hsl(145 45% 32%)', bg: 'hsl(145 40% 91%)', border: 'hsl(145 40% 48%)' },
 }
 
-const TASK_STATUS_CYCLE: Record<string, 'todo' | 'in-progress' | 'done'> = {
+const TASK_CYCLE: Record<string, 'todo' | 'in-progress' | 'done'> = {
   'todo': 'in-progress', 'in-progress': 'done', 'done': 'todo',
 }
 
@@ -58,7 +58,7 @@ export default function GoalCard({ goal, tasks, isFirst, isLast, onMove, onEdit,
   }
 
   const toggleTask = async (task: GoalTask) => {
-    await supabase.from('goal_tasks').update({ status: TASK_STATUS_CYCLE[task.status] }).eq('id', task.id)
+    await supabase.from('goal_tasks').update({ status: TASK_CYCLE[task.status] }).eq('id', task.id)
     onTasksChanged()
   }
 
@@ -72,80 +72,85 @@ export default function GoalCard({ goal, tasks, isFirst, isLast, onMove, onEdit,
       borderColor: '#e0e0e0', borderLeft: `5px solid ${s.border}`,
       borderRadius: '12px', overflow: 'hidden', background: '#fff',
     }}>
-      <div className="flex flex-col md:flex-row">
+      <div className="flex items-stretch">
 
-        {/* Levý sloupec — info o cíli */}
-        <div className="md:w-5/12 p-5 flex flex-col gap-3" style={{ borderRight: '1px solid #f0f0f0' }}>
+        {/* Obrázek — pevná šířka, celý viditelný */}
+        <div style={{
+          width: 110, minWidth: 110,
+          background: 'hsl(38 35% 93%)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+        }}>
           {goal.image_url ? (
-            <div style={{ aspectRatio: '4/3', borderRadius: 8, overflow: 'hidden', background: '#f0f0f0' }}>
-              <img src={goal.image_url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-            </div>
+            <img src={goal.image_url} alt=""
+              style={{ width: '100%', height: '100%', objectFit: 'contain', padding: '10px' }} />
           ) : (
-            <div style={{ aspectRatio: '4/3', borderRadius: 8, background: 'hsl(38 35% 92%)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '3rem' }}>
-              🎯
-            </div>
+            <span style={{ fontSize: '2.2rem' }}>🎯</span>
           )}
+        </div>
 
-          <span className="font-notes text-xs px-2.5 py-1 rounded-full self-start"
-            style={{ background: s.bg, color: s.color }}>
-            {s.label}
-          </span>
-
-          <h3 className="font-hand leading-tight" style={{ fontSize: '1.8rem', color: 'hsl(25 30% 15%)' }}>
-            {goal.title}
-          </h3>
-
-          {goal.description && (
-            <p className="font-notes text-sm leading-relaxed" style={{ color: 'hsl(25 20% 40%)' }}>
-              {goal.description}
-            </p>
-          )}
-
-          <div className="flex items-center gap-2 mt-auto pt-2">
+        {/* Info o cíli */}
+        <div className="flex flex-col justify-between p-3 gap-1"
+          style={{ width: 220, minWidth: 180, borderRight: '1px solid #f0f0f0' }}>
+          <div>
+            <span className="font-notes text-xs px-2 py-0.5 rounded-full"
+              style={{ background: s.bg, color: s.color }}>
+              {s.label}
+            </span>
+            <h3 className="font-hand leading-tight mt-1" style={{ fontSize: '1.35rem', color: 'hsl(25 30% 15%)' }}>
+              {goal.title}
+            </h3>
+            {goal.description && (
+              <p className="font-notes text-xs leading-snug mt-0.5 line-clamp-2"
+                style={{ color: 'hsl(25 20% 45%)' }}>
+                {goal.description}
+              </p>
+            )}
+          </div>
+          <div className="flex items-center gap-1 mt-1">
             <button onClick={onEdit}
-              className="font-notes text-xs px-3 py-1.5 rounded-lg"
+              className="font-notes text-xs px-2.5 py-1 rounded-lg"
               style={{ border: '1px solid #e0e0e0', background: '#f9f9f9', color: 'hsl(25 30% 15%)' }}>
               Upravit
             </button>
             <button onClick={() => setConfirmDelete(true)}
-              className="font-notes text-xs px-3 py-1.5 rounded-lg"
+              className="font-notes text-xs px-2.5 py-1 rounded-lg"
               style={{ border: '1px solid #fca5a5', background: '#fff5f5', color: 'hsl(0 60% 48%)' }}>
               Smazat
             </button>
             <div className="flex gap-1 ml-auto">
               {!isFirst && (
                 <button onClick={() => onMove('up')}
-                  className="w-7 h-7 rounded-lg flex items-center justify-center text-sm"
+                  className="w-6 h-6 rounded flex items-center justify-center text-xs"
                   style={{ background: '#f0f0f0', color: 'hsl(25 30% 15%)' }}>↑</button>
               )}
               {!isLast && (
                 <button onClick={() => onMove('down')}
-                  className="w-7 h-7 rounded-lg flex items-center justify-center text-sm"
+                  className="w-6 h-6 rounded flex items-center justify-center text-xs"
                   style={{ background: '#f0f0f0', color: 'hsl(25 30% 15%)' }}>↓</button>
               )}
             </div>
           </div>
         </div>
 
-        {/* Pravý sloupec — podcíle */}
-        <div className="md:w-7/12 p-5 flex flex-col">
+        {/* Podcíle */}
+        <div className="flex-1 flex flex-col p-3 gap-0.5 min-w-0">
           {/* Hlavička */}
-          <div className="grid gap-2 pb-2 mb-1" style={{
+          <div className="grid gap-2 pb-1 mb-0.5" style={{
             gridTemplateColumns: '1fr auto auto auto',
             borderBottom: '1px solid #f0f0f0',
           }}>
             {['Podcíl', 'Deadline', 'Stav', ''].map((h, i) => (
               <span key={i} className="font-notes text-xs uppercase tracking-widest"
-                style={{ color: 'hsl(25 15% 55%)', textAlign: i > 0 ? 'right' : 'left' }}>
+                style={{ color: 'hsl(25 15% 60%)', textAlign: i > 0 ? 'right' : 'left' }}>
                 {h}
               </span>
             ))}
           </div>
 
-          {/* Řádky podcílů */}
+          {/* Řádky */}
           <div className="flex flex-col gap-0.5 flex-1">
             {tasks.length === 0 && !addingTask && (
-              <p className="font-notes text-sm py-4 text-center" style={{ color: 'hsl(25 15% 60%)' }}>
+              <p className="font-notes text-xs py-2 text-center" style={{ color: 'hsl(25 15% 65%)' }}>
                 Zatím žádné podcíle
               </p>
             )}
@@ -155,34 +160,34 @@ export default function GoalCard({ goal, tasks, isFirst, isLast, onMove, onEdit,
               const dl = daysLeft(task.deadline)
               return (
                 <div key={task.id}
-                  className="grid items-center py-1.5 px-2 rounded-lg gap-2"
+                  className="grid items-center px-1.5 py-1 rounded gap-2"
                   style={{
                     gridTemplateColumns: '1fr auto auto auto',
                     background: isDone ? 'hsl(145 40% 91%)' : isIP ? 'hsl(38 80% 96%)' : 'transparent',
                     transition: 'background 0.2s',
                   }}>
-                  <span className="font-notes text-sm truncate" style={{
+                  <span className="font-notes text-xs truncate" style={{
                     color: isDone ? 'hsl(145 45% 30%)' : 'hsl(25 30% 15%)',
                     textDecoration: isDone ? 'line-through' : 'none',
                   }}>
                     {task.title}
                   </span>
                   <span className="font-notes text-xs whitespace-nowrap text-right" style={{
-                    color: dl?.overdue ? 'hsl(0 65% 50%)' : isDone ? 'hsl(145 35% 45%)' : 'hsl(25 15% 50%)',
+                    color: dl?.overdue ? 'hsl(0 65% 50%)' : isDone ? 'hsl(145 35% 45%)' : 'hsl(25 15% 55%)',
                   }}>
                     {dl?.text ?? '—'}
                   </span>
                   <button onClick={() => toggleTask(task)}
-                    className="font-notes text-xs px-2 py-0.5 rounded-full whitespace-nowrap cursor-pointer"
+                    className="font-notes text-xs px-2 py-0.5 rounded-full whitespace-nowrap"
                     style={{
                       background: isDone ? 'hsl(145 40% 84%)' : isIP ? 'hsl(38 80% 88%)' : '#f0f0f0',
-                      color: isDone ? 'hsl(145 45% 30%)' : isIP ? 'hsl(38 80% 35%)' : 'hsl(25 15% 50%)',
-                      border: 'none',
+                      color: isDone ? 'hsl(145 45% 30%)' : isIP ? 'hsl(38 80% 35%)' : 'hsl(25 15% 55%)',
+                      border: 'none', cursor: 'pointer',
                     }}>
                     {isDone ? 'Hotovo' : isIP ? 'Probíhá' : 'Todo'}
                   </button>
                   <button onClick={() => deleteTask(task.id)}
-                    className="w-5 h-5 rounded-full flex items-center justify-center text-xs opacity-30 hover:opacity-90 transition-opacity"
+                    className="w-4 h-4 rounded-full flex items-center justify-center text-xs opacity-30 hover:opacity-90 transition-opacity"
                     style={{ background: '#fca5a5', color: 'hsl(0 60% 45%)' }}>✕</button>
                 </div>
               )
@@ -191,34 +196,30 @@ export default function GoalCard({ goal, tasks, isFirst, isLast, onMove, onEdit,
 
           {/* Přidat podcíl */}
           {addingTask ? (
-            <div className="mt-3 flex flex-col gap-2 pt-3" style={{ borderTop: '1px solid #f0f0f0' }}>
+            <div className="flex flex-col gap-1.5 pt-2" style={{ borderTop: '1px solid #f0f0f0' }}>
               <input
                 type="text" value={newTitle} onChange={e => setNewTitle(e.target.value)}
                 placeholder="Název podcíle…"
-                className="w-full px-3 py-2 rounded-xl font-notes text-sm outline-none"
+                className="w-full px-2.5 py-1.5 rounded-lg font-notes text-xs outline-none"
                 style={{ background: '#f9f9f9', border: '1px solid hsl(30 25% 80%)', color: 'hsl(25 30% 15%)' }}
                 autoFocus onKeyDown={e => e.key === 'Enter' && addTask()}
               />
-              <div className="flex gap-2">
+              <div className="flex gap-1.5">
                 <input type="date" value={newDeadline} onChange={e => setNewDeadline(e.target.value)}
-                  className="flex-1 px-3 py-2 rounded-xl font-notes text-sm outline-none"
+                  className="flex-1 px-2.5 py-1.5 rounded-lg font-notes text-xs outline-none"
                   style={{ background: '#f9f9f9', border: '1px solid hsl(30 25% 80%)', color: 'hsl(25 30% 15%)' }} />
                 <button onClick={addTask}
-                  className="px-4 py-2 rounded-xl font-notes text-sm"
-                  style={{ background: 'hsl(25 30% 15%)', color: 'hsl(40 35% 95%)' }}>
-                  Přidat
-                </button>
+                  className="px-3 py-1.5 rounded-lg font-notes text-xs"
+                  style={{ background: 'hsl(25 30% 15%)', color: 'hsl(40 35% 95%)' }}>Přidat</button>
                 <button onClick={() => setAddingTask(false)}
-                  className="px-3 py-2 rounded-xl font-notes text-sm"
-                  style={{ background: '#f0f0f0', color: 'hsl(25 15% 50%)' }}>
-                  Zrušit
-                </button>
+                  className="px-2.5 py-1.5 rounded-lg font-notes text-xs"
+                  style={{ background: '#f0f0f0', color: 'hsl(25 15% 50%)' }}>Zrušit</button>
               </div>
             </div>
           ) : (
             <button onClick={() => setAddingTask(true)}
-              className="mt-3 font-notes text-sm py-2 rounded-xl"
-              style={{ border: '1px dashed hsl(30 25% 75%)', color: 'hsl(25 15% 55%)', background: 'transparent' }}>
+              className="mt-1 font-notes text-xs py-1 rounded-lg"
+              style={{ border: '1px dashed hsl(30 25% 78%)', color: 'hsl(25 15% 60%)', background: 'transparent' }}>
               + přidat podcíl
             </button>
           )}

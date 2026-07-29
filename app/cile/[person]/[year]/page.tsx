@@ -100,7 +100,7 @@ export default function GoalsPage() {
           </div>
         )}
 
-        <div className="space-y-6">
+        <div className="space-y-3">
           {goals.map((goal, i) => (
             <GoalCard
               key={goal.id}
