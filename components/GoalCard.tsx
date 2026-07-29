@@ -168,7 +168,6 @@ export default function GoalCard({ goal, tasks, isFirst, isLast, onMove, onEdit,
                   }}>
                   <span className="font-notes text-xs truncate" style={{
                     color: isDone ? 'hsl(145 45% 30%)' : 'hsl(25 30% 15%)',
-                    textDecoration: isDone ? 'line-through' : 'none',
                   }}>
                     {task.title}
                   </span>

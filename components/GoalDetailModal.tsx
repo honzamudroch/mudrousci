@@ -164,7 +164,6 @@ export default function GoalDetailModal({ goal, tasks, onClose, onEdit, onDelete
                     }}>
                     <span className="font-notes text-sm truncate" style={{
                       color: isDone ? 'hsl(145 45% 30%)' : 'hsl(25 30% 15%)',
-                      textDecoration: isDone ? 'line-through' : 'none',
                     }}>
                       {task.title}
                     </span>
