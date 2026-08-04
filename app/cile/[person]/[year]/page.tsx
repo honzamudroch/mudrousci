@@ -23,6 +23,11 @@ const STATUS_BORDER = {
   'in-progress': 'hsl(38 80% 55%)',
   'done':        'hsl(145 40% 48%)',
 }
+const STATUS_IMG_BG = {
+  'todo':        'hsl(25 20% 87%)',
+  'in-progress': 'hsl(38 80% 85%)',
+  'done':        'hsl(145 40% 83%)',
+}
 
 const LABELS: Record<string, string> = { honza: 'Honza', lucka: 'Lucka' }
 
@@ -172,7 +177,7 @@ export default function GoalsPage() {
                   onClick={() => setSelectedGoal(goal)}
                 >
                   <div style={{
-                    aspectRatio: '1 / 1', background: 'hsl(38 35% 93%)',
+                    aspectRatio: '1 / 1', background: STATUS_IMG_BG[goal.status],
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                   }}>
                     {goal.image_url ? (
