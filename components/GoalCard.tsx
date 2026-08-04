@@ -77,8 +77,9 @@ export default function GoalCard({ goal, tasks, isFirst, isLast, onMove, onEdit,
         {/* Obrázek — pevná šířka, celý viditelný */}
         <div style={{
           width: 110, minWidth: 110,
-          background: 'hsl(38 35% 93%)',
+          background: goal.status === 'todo' ? 'hsl(38 35% 93%)' : s.panelBg,
           display: 'flex', alignItems: 'center', justifyContent: 'center',
+          transition: 'background 0.3s',
         }}>
           {goal.image_url ? (
             <img src={goal.image_url} alt=""
