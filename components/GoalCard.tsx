@@ -20,9 +20,9 @@ interface Props {
 }
 
 const STATUS = {
-  'todo':        { label: 'Plánováno', color: 'hsl(25 15% 50%)',  bg: 'hsl(25 10% 92%)',  border: '#d1c5b8' },
-  'in-progress': { label: 'Probíhá',  color: 'hsl(38 80% 38%)',  bg: 'hsl(38 80% 93%)',  border: 'hsl(38 80% 58%)' },
-  'done':        { label: 'Hotovo ✓', color: 'hsl(145 45% 32%)', bg: 'hsl(145 40% 91%)', border: 'hsl(145 40% 48%)' },
+  'todo':        { label: 'Plánováno', color: 'hsl(25 15% 50%)',  bg: 'hsl(25 10% 92%)',  border: '#d1c5b8',           panelBg: 'transparent' },
+  'in-progress': { label: 'Probíhá',  color: 'hsl(38 80% 38%)',  bg: 'hsl(38 80% 93%)',  border: 'hsl(38 80% 58%)',   panelBg: 'hsl(38 80% 97%)' },
+  'done':        { label: 'Hotovo ✓', color: 'hsl(145 45% 32%)', bg: 'hsl(145 40% 91%)', border: 'hsl(145 40% 48%)',  panelBg: 'hsl(145 40% 96%)' },
 }
 
 const TASK_CYCLE: Record<string, 'todo' | 'in-progress' | 'done'> = {
@@ -133,7 +133,7 @@ export default function GoalCard({ goal, tasks, isFirst, isLast, onMove, onEdit,
         </div>
 
         {/* Podcíle */}
-        <div className="flex-1 flex flex-col p-3 gap-0.5 min-w-0">
+        <div className="flex-1 flex flex-col p-3 gap-0.5 min-w-0" style={{ background: s.panelBg, transition: 'background 0.3s' }}>
           {/* Hlavička */}
           <div className="grid gap-2 pb-1 mb-0.5" style={{
             gridTemplateColumns: '1fr auto auto auto',

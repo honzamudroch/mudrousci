@@ -88,6 +88,11 @@ export default function GoalsPage() {
 
   useEffect(() => { loadData() }, [])
 
+  const STATUS_ORDER: Record<string, number> = { 'in-progress': 0, 'done': 1, 'todo': 2 }
+  const sortedGoals = [...goals].sort(
+    (a, b) => STATUS_ORDER[a.status] - STATUS_ORDER[b.status] || a.order_idx - b.order_idx
+  )
+
   const personLabel = LABELS[person] ?? person
 
   return (
@@ -153,7 +158,7 @@ export default function GoalsPage() {
         {/* Grid dlaždic */}
         {view === 'grid' && (
           <div className="grid gap-4" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))' }}>
-            {goals.map(goal => {
+            {sortedGoals.map(goal => {
               const borderColor = STATUS_BORDER[goal.status]
               return (
                 <div
@@ -196,13 +201,13 @@ export default function GoalsPage() {
         {/* Seznam s detailem */}
         {view === 'list' && (
           <div className="space-y-3">
-            {goals.map((goal, i) => (
+            {sortedGoals.map((goal, i) => (
               <GoalCard
                 key={goal.id}
                 goal={goal}
                 tasks={tasks.filter(t => t.goal_id === goal.id)}
                 isFirst={i === 0}
-                isLast={i === goals.length - 1}
+                isLast={i === sortedGoals.length - 1}
                 onMove={dir => moveGoal(goal.id, dir)}
                 onEdit={() => { setEditGoal(goal); setShowAddGoal(true) }}
                 onDeleted={loadData}
