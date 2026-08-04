@@ -20,9 +20,9 @@ interface Props {
 }
 
 const STATUS = {
-  'todo':        { label: 'Plánováno', color: 'hsl(25 15% 50%)',  bg: 'hsl(25 10% 92%)',  border: '#d1c5b8',           panelBg: 'transparent' },
-  'in-progress': { label: 'Probíhá',  color: 'hsl(38 80% 38%)',  bg: 'hsl(38 80% 93%)',  border: 'hsl(38 80% 58%)',   panelBg: 'hsl(38 80% 97%)' },
-  'done':        { label: 'Hotovo ✓', color: 'hsl(145 45% 32%)', bg: 'hsl(145 40% 91%)', border: 'hsl(145 40% 48%)',  panelBg: 'hsl(145 40% 96%)' },
+  'todo':        { label: 'Plánováno', color: 'hsl(25 15% 50%)',  bg: 'hsl(25 10% 92%)',  border: '#d1c5b8',          imgBg: 'hsl(25 20% 87%)' },
+  'in-progress': { label: 'Probíhá',  color: 'hsl(38 80% 38%)',  bg: 'hsl(38 80% 93%)',  border: 'hsl(38 80% 58%)',  imgBg: 'hsl(38 80% 85%)' },
+  'done':        { label: 'Hotovo ✓', color: 'hsl(145 45% 32%)', bg: 'hsl(145 40% 91%)', border: 'hsl(145 40% 48%)', imgBg: 'hsl(145 40% 83%)' },
 }
 
 const TASK_CYCLE: Record<string, 'todo' | 'in-progress' | 'done'> = {
@@ -77,7 +77,7 @@ export default function GoalCard({ goal, tasks, isFirst, isLast, onMove, onEdit,
         {/* Obrázek — pevná šířka, celý viditelný */}
         <div style={{
           width: 110, minWidth: 110,
-          background: goal.status === 'todo' ? 'hsl(38 35% 93%)' : s.panelBg,
+          background: s.imgBg,
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           transition: 'background 0.3s',
         }}>
@@ -134,7 +134,7 @@ export default function GoalCard({ goal, tasks, isFirst, isLast, onMove, onEdit,
         </div>
 
         {/* Podcíle */}
-        <div className="flex-1 flex flex-col p-3 gap-0.5 min-w-0" style={{ background: s.panelBg, transition: 'background 0.3s' }}>
+        <div className="flex-1 flex flex-col p-3 gap-0.5 min-w-0" style={{ background: '#fff' }}>
           {/* Hlavička */}
           <div className="grid gap-2 pb-1 mb-0.5" style={{
             gridTemplateColumns: '1fr auto auto auto',
