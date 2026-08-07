@@ -66,6 +66,10 @@ export default function Header({ countLabel }: { countLabel?: string } = {}) {
             style={{color: 'hsl(25 30% 15%)'}}>
             Cíle
           </button>
+          <button onClick={() => router.push('/navyky')} className={linkClass('/navyky')}
+            style={{color: 'hsl(25 30% 15%)'}}>
+            Návyky
+          </button>
           <button onClick={handleLogout}
             className="font-notes text-sm underline decoration-dotted"
             style={{color: 'hsl(25 15% 40%)'}}>
@@ -120,6 +124,10 @@ export default function Header({ countLabel }: { countLabel?: string } = {}) {
           <button onClick={() => { router.push('/cile'); setMenuOpen(false) }}
             className={linkClass('/cile')} style={{color: 'hsl(25 30% 15%)', textAlign: 'left'}}>
             Cíle
+          </button>
+          <button onClick={() => { router.push('/navyky'); setMenuOpen(false) }}
+            className={linkClass('/navyky')} style={{color: 'hsl(25 30% 15%)', textAlign: 'left'}}>
+            Návyky
           </button>
           <button onClick={handleLogout}
             className="font-notes text-sm underline decoration-dotted text-left"
