@@ -130,7 +130,7 @@ export default function NavykyPage() {
       <div className="overflow-x-auto">
         <table style={{ width: '100%', borderCollapse: 'separate', borderSpacing: '0' }}>
           <colgroup>
-            <col style={{ minWidth: 160 }} />
+            <col style={{ width: 120, maxWidth: 120 }} />
             {weekDays.map((_, i) => <col key={i} style={{ width: 44 }} />)}
             <col style={{ width: 50 }} />
           </colgroup>
@@ -170,8 +170,9 @@ export default function NavykyPage() {
                     <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                       {habit.emoji && <span style={{ fontSize: '1rem', lineHeight: 1, flexShrink: 0 }}>{habit.emoji}</span>}
                       <span className="font-notes" style={{
-                        fontSize: '0.85rem', color: 'hsl(25 30% 15%)', lineHeight: 1.2,
-                      }}>{habit.title}</span>
+                        fontSize: '0.82rem', color: 'hsl(25 30% 15%)', lineHeight: 1.2,
+                        overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 90,
+                      }} title={habit.title}>{habit.title}</span>
                     </div>
                   </td>
                   {weekDays.map(date => {
