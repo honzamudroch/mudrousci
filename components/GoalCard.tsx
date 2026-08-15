@@ -133,14 +133,14 @@ export default function GoalCard({ goal, tasks, isFirst, isLast, onMove, onEdit,
           </div>
         </div>
 
-        {/* Podcíle */}
+        {/* Úkoly */}
         <div className="flex-1 flex flex-col p-3 gap-0.5 min-w-0" style={{ background: '#fff' }}>
           {/* Hlavička */}
           <div className="grid gap-2 pb-1 mb-0.5" style={{
             gridTemplateColumns: '1fr auto auto auto',
             borderBottom: '1px solid #f0f0f0',
           }}>
-            {['Podcíl', 'Deadline', 'Stav', ''].map((h, i) => (
+            {['Úkol', 'Deadline', 'Stav', ''].map((h, i) => (
               <span key={i} className="font-notes text-xs uppercase tracking-widest"
                 style={{ color: 'hsl(25 15% 60%)', textAlign: i > 0 ? 'right' : 'left' }}>
                 {h}
@@ -152,7 +152,7 @@ export default function GoalCard({ goal, tasks, isFirst, isLast, onMove, onEdit,
           <div className="flex flex-col gap-0.5 flex-1">
             {tasks.length === 0 && !addingTask && (
               <p className="font-notes text-xs py-2 text-center" style={{ color: 'hsl(25 15% 65%)' }}>
-                Zatím žádné podcíle
+                Zatím žádné úkoly
               </p>
             )}
             {tasks.map(task => {
@@ -199,7 +199,7 @@ export default function GoalCard({ goal, tasks, isFirst, isLast, onMove, onEdit,
             <div className="flex flex-col gap-1.5 pt-2" style={{ borderTop: '1px solid #f0f0f0' }}>
               <input
                 type="text" value={newTitle} onChange={e => setNewTitle(e.target.value)}
-                placeholder="Název podcíle…"
+                placeholder="Název úkoly…"
                 className="w-full px-2.5 py-1.5 rounded-lg font-notes text-xs outline-none"
                 style={{ background: '#f9f9f9', border: '1px solid hsl(30 25% 80%)', color: 'hsl(25 30% 15%)' }}
                 autoFocus onKeyDown={e => e.key === 'Enter' && addTask()}
@@ -220,7 +220,7 @@ export default function GoalCard({ goal, tasks, isFirst, isLast, onMove, onEdit,
             <button onClick={() => setAddingTask(true)}
               className="mt-1 font-notes text-xs py-1 rounded-lg"
               style={{ border: '1px dashed hsl(30 25% 78%)', color: 'hsl(25 15% 60%)', background: 'transparent' }}>
-              + přidat podcíl
+              + přidat úkol
             </button>
           )}
         </div>
@@ -236,7 +236,7 @@ export default function GoalCard({ goal, tasks, isFirst, isLast, onMove, onEdit,
               Smazat cíl?
             </p>
             <p className="font-notes text-sm mb-6" style={{ color: 'hsl(25 15% 50%)' }}>
-              „{goal.title}" a všechny jeho podcíle budou smazány.
+              „{goal.title}" a všechny jeho úkoly budou smazány.
             </p>
             <div className="flex gap-2">
               <button onClick={() => setConfirmDelete(false)}

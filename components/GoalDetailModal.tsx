@@ -124,11 +124,11 @@ export default function GoalDetailModal({ goal, tasks, onClose, onEdit, onDelete
             </div>
           </div>
 
-          {/* Pravý sloupec — podcíle */}
+          {/* Pravý sloupec — úkoly */}
           <div className="flex-1 flex flex-col p-5 min-w-0 overflow-y-auto">
             <h4 className="font-notes text-xs uppercase tracking-widest mb-3"
               style={{ color: 'hsl(25 15% 55%)' }}>
-              Podcíle
+              Úkoly
             </h4>
 
             {/* Hlavička */}
@@ -147,7 +147,7 @@ export default function GoalDetailModal({ goal, tasks, onClose, onEdit, onDelete
             <div className="flex flex-col gap-1 flex-1">
               {tasks.length === 0 && !addingTask && (
                 <p className="font-notes text-sm py-6 text-center" style={{ color: 'hsl(25 15% 65%)' }}>
-                  Zatím žádné podcíle
+                  Zatím žádné úkoly
                 </p>
               )}
               {tasks.map(task => {
@@ -194,7 +194,7 @@ export default function GoalDetailModal({ goal, tasks, onClose, onEdit, onDelete
               <div className="flex flex-col gap-2 pt-3 mt-2" style={{ borderTop: '1px solid #f0f0f0' }}>
                 <input
                   type="text" value={newTitle} onChange={e => setNewTitle(e.target.value)}
-                  placeholder="Název podcíle…"
+                  placeholder="Název úkoly…"
                   className="w-full px-3 py-2 rounded-xl font-notes text-sm outline-none"
                   style={{ background: '#f9f9f9', border: '1px solid hsl(30 25% 80%)', color: 'hsl(25 30% 15%)' }}
                   autoFocus onKeyDown={e => e.key === 'Enter' && addTask()}
@@ -215,7 +215,7 @@ export default function GoalDetailModal({ goal, tasks, onClose, onEdit, onDelete
               <button onClick={() => setAddingTask(true)}
                 className="mt-3 font-notes text-sm py-2 rounded-xl"
                 style={{ border: '1px dashed hsl(30 25% 75%)', color: 'hsl(25 15% 55%)', background: 'transparent' }}>
-                + přidat podcíl
+                + přidat úkol
               </button>
             )}
           </div>
@@ -231,7 +231,7 @@ export default function GoalDetailModal({ goal, tasks, onClose, onEdit, onDelete
             style={{ border: '1px solid #e0e0e0', background: '#fff' }}>
             <p className="font-hand mb-2" style={{ fontSize: '1.6rem', color: 'hsl(25 30% 15%)' }}>Smazat cíl?</p>
             <p className="font-notes text-sm mb-6" style={{ color: 'hsl(25 15% 50%)' }}>
-              „{goal.title}" a všechny jeho podcíle budou smazány.
+              „{goal.title}" a všechny jeho úkoly budou smazány.
             </p>
             <div className="flex gap-2">
               <button onClick={() => setConfirmDelete(false)}

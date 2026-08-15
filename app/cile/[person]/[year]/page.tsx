@@ -105,6 +105,14 @@ export default function GoalsPage() {
       <Header />
       <main className="flex-1 mx-auto max-w-5xl w-full px-4 md:px-8 py-6 md:py-8">
 
+        {person === 'lucka' && (
+          <div className="relative w-full mb-2 overflow-hidden rounded-2xl"
+            style={{ height: 180, background: 'hsl(25 15% 94%)' }}>
+            <img src="/lucka-header.png" alt=""
+              style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 20%' }} />
+          </div>
+        )}
+
         <div className="flex items-center gap-3 mb-8 flex-wrap">
           <button onClick={() => router.push('/cile')}
             className="font-notes text-sm px-3 py-1.5 rounded-lg shrink-0"
