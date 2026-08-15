@@ -59,7 +59,7 @@ export default function GoalsPage() {
   const [goals, setGoals] = useState<Goal[]>([])
   const [tasks, setTasks] = useState<GoalTask[]>([])
   const [loading, setLoading] = useState(true)
-  const [view, setView] = useState<'grid' | 'list'>('grid')
+  const [view, setView] = useState<'grid' | 'list'>('list')
   const [selectedGoal, setSelectedGoal] = useState<Goal | null>(null)
   const [showAddGoal, setShowAddGoal] = useState(false)
   const [editGoal, setEditGoal] = useState<Goal | null>(null)
