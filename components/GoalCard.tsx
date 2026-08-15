@@ -4,13 +4,13 @@ import { useState } from 'react'
 import { createClient } from '@/lib/supabase'
 
 interface Goal {
-  id: string; person: string; year: number; title: string
-  description: string | null; image_url: string | null; comment: string | null
+  id: string; person: string; rok: number; nazev: string
+  popis: string | null; image_url: string | null; comment: string | null
   status: 'todo' | 'in-progress' | 'done'; order_idx: number
 }
 interface GoalTask {
-  id: string; goal_id: string; title: string
-  deadline: string | null; status: 'todo' | 'in-progress' | 'done'; order_idx: number
+  id: string; projekt_id: string; nazev: string
+  due_date: string | null; status: 'todo' | 'in-progress' | 'done'; order_idx: number
 }
 interface Props {
   goal: Goal; tasks: GoalTask[]
@@ -29,9 +29,9 @@ const TASK_CYCLE: Record<string, 'todo' | 'in-progress' | 'done'> = {
   'todo': 'in-progress', 'in-progress': 'done', 'done': 'todo',
 }
 
-function daysLeft(deadline: string | null): { text: string; overdue: boolean } | null {
-  if (!deadline) return null
-  const days = Math.ceil((new Date(deadline).getTime() - Date.now()) / 86400000)
+function daysLeft(due_date: string | null): { text: string; overdue: boolean } | null {
+  if (!due_date) return null
+  const days = Math.ceil((new Date(due_date).getTime() - Date.now()) / 86400000)
   if (days < 0) return { text: `po termínu (${Math.abs(days)} d)`, overdue: true }
   if (days === 0) return { text: 'dnes', overdue: false }
   if (days === 1) return { text: 'zítra', overdue: false }
@@ -39,8 +39,8 @@ function daysLeft(deadline: string | null): { text: string; overdue: boolean } |
 }
 
 export default function GoalCard({ goal, tasks, isFirst, isLast, onMove, onEdit, onDeleted, onTasksChanged }: Props) {
-  const [newTitle, setNewTitle] = useState('')
-  const [newDeadline, setNewDeadline] = useState('')
+  const [newNazev, setNewNazev] = useState('')
+  const [newDueDate, setNewDueDate] = useState('')
   const [addingTask, setAddingTask] = useState(false)
   const [confirmDelete, setConfirmDelete] = useState(false)
   const [comment, setComment] = useState(goal.comment ?? '')
@@ -52,7 +52,7 @@ export default function GoalCard({ goal, tasks, isFirst, isLast, onMove, onEdit,
 
   const saveComment = async () => {
     const val = commentDraft.trim() || null
-    await supabase.from('goals').update({ comment: val }).eq('id', goal.id)
+    await supabase.from('ukoly_projekty').update({ comment: val }).eq('id', goal.id)
     setComment(commentDraft.trim())
     setEditingComment(false)
   }
@@ -64,23 +64,32 @@ export default function GoalCard({ goal, tasks, isFirst, isLast, onMove, onEdit,
   }
 
   const addTask = async () => {
-    if (!newTitle.trim()) return
+    if (!newNazev.trim()) return
     const maxOrder = tasks.reduce((m, t) => Math.max(m, t.order_idx), -1)
-    await supabase.from('goal_tasks').insert({
-      goal_id: goal.id, title: newTitle.trim(),
-      deadline: newDeadline || null, status: 'todo', order_idx: maxOrder + 1,
+    await supabase.from('ukoly').insert({
+      person: goal.person,
+      projekt_id: goal.id,
+      nazev: newNazev.trim(),
+      due_date: newDueDate || null,
+      status: 'todo',
+      priorita: 'none',
+      archived: false,
+      pinned: false,
+      order_idx: maxOrder + 1,
     })
-    setNewTitle(''); setNewDeadline(''); setAddingTask(false)
+    setNewNazev(''); setNewDueDate(''); setAddingTask(false)
     onTasksChanged()
   }
 
   const toggleTask = async (task: GoalTask) => {
-    await supabase.from('goal_tasks').update({ status: TASK_CYCLE[task.status] }).eq('id', task.id)
+    const ns = TASK_CYCLE[task.status]
+    const completed_at = ns === 'done' ? new Date().toISOString() : null
+    await supabase.from('ukoly').update({ status: ns, completed_at }).eq('id', task.id)
     onTasksChanged()
   }
 
   const deleteTask = async (id: string) => {
-    await supabase.from('goal_tasks').delete().eq('id', id)
+    await supabase.from('ukoly').delete().eq('id', id)
     onTasksChanged()
   }
 
@@ -91,7 +100,7 @@ export default function GoalCard({ goal, tasks, isFirst, isLast, onMove, onEdit,
     }}>
       <div className="flex items-stretch">
 
-        {/* Obrázek — pevná šířka, celý viditelný */}
+        {/* Obrázek */}
         <div style={{
           width: 110, minWidth: 110,
           background: s.imgBg,
@@ -115,12 +124,12 @@ export default function GoalCard({ goal, tasks, isFirst, isLast, onMove, onEdit,
               {s.label}
             </span>
             <h3 className="font-hand leading-tight mt-1" style={{ fontSize: '1.35rem', color: 'hsl(25 30% 15%)' }}>
-              {goal.title}
+              {goal.nazev}
             </h3>
-            {goal.description && (
+            {goal.popis && (
               <p className="font-notes text-xs leading-snug mt-0.5 line-clamp-2"
                 style={{ color: 'hsl(25 20% 45%)' }}>
-                {goal.description}
+                {goal.popis}
               </p>
             )}
           </div>
@@ -165,7 +174,6 @@ export default function GoalCard({ goal, tasks, isFirst, isLast, onMove, onEdit,
 
         {/* Úkoly */}
         <div className="flex-1 flex flex-col p-3 gap-0.5 min-w-0" style={{ background: '#fff' }}>
-          {/* Hlavička */}
           <div className="grid gap-2 pb-1 mb-0.5" style={{
             gridTemplateColumns: '1fr auto auto auto',
             borderBottom: '1px solid #f0f0f0',
@@ -178,7 +186,6 @@ export default function GoalCard({ goal, tasks, isFirst, isLast, onMove, onEdit,
             ))}
           </div>
 
-          {/* Řádky */}
           <div className="flex flex-col gap-0.5 flex-1">
             {tasks.length === 0 && !addingTask && (
               <p className="font-notes text-xs py-2 text-center" style={{ color: 'hsl(25 15% 65%)' }}>
@@ -188,7 +195,7 @@ export default function GoalCard({ goal, tasks, isFirst, isLast, onMove, onEdit,
             {tasks.map(task => {
               const isDone = task.status === 'done'
               const isIP = task.status === 'in-progress'
-              const dl = daysLeft(task.deadline)
+              const dl = daysLeft(task.due_date)
               return (
                 <div key={task.id}
                   className="grid items-center px-1.5 py-1 rounded gap-2"
@@ -197,14 +204,12 @@ export default function GoalCard({ goal, tasks, isFirst, isLast, onMove, onEdit,
                     background: isDone ? 'hsl(145 40% 91%)' : isIP ? 'hsl(38 80% 96%)' : 'transparent',
                     transition: 'background 0.2s',
                   }}>
-                  <span className="font-notes text-xs truncate" style={{
-                    color: isDone ? 'hsl(145 45% 30%)' : 'hsl(25 30% 15%)',
-                  }}>
-                    {task.title}
+                  <span className="font-notes text-xs truncate"
+                    style={{ color: isDone ? 'hsl(145 45% 30%)' : 'hsl(25 30% 15%)' }}>
+                    {task.nazev}
                   </span>
-                  <span className="font-notes text-xs whitespace-nowrap text-right" style={{
-                    color: dl?.overdue ? 'hsl(0 65% 50%)' : isDone ? 'hsl(145 35% 45%)' : 'hsl(25 15% 55%)',
-                  }}>
+                  <span className="font-notes text-xs whitespace-nowrap text-right"
+                    style={{ color: dl?.overdue ? 'hsl(0 65% 50%)' : isDone ? 'hsl(145 35% 45%)' : 'hsl(25 15% 55%)' }}>
                     {dl?.text ?? '—'}
                   </span>
                   <button onClick={() => toggleTask(task)}
@@ -224,18 +229,17 @@ export default function GoalCard({ goal, tasks, isFirst, isLast, onMove, onEdit,
             })}
           </div>
 
-          {/* Přidat podcíl */}
           {addingTask ? (
             <div className="flex flex-col gap-1.5 pt-2" style={{ borderTop: '1px solid #f0f0f0' }}>
               <input
-                type="text" value={newTitle} onChange={e => setNewTitle(e.target.value)}
-                placeholder="Název úkoly…"
+                type="text" value={newNazev} onChange={e => setNewNazev(e.target.value)}
+                placeholder="Název úkolu…"
                 className="w-full px-2.5 py-1.5 rounded-lg font-notes text-xs outline-none"
                 style={{ background: '#f9f9f9', border: '1px solid hsl(30 25% 80%)', color: 'hsl(25 30% 15%)' }}
                 autoFocus onKeyDown={e => e.key === 'Enter' && addTask()}
               />
               <div className="flex gap-1.5">
-                <input type="date" value={newDeadline} onChange={e => setNewDeadline(e.target.value)}
+                <input type="date" value={newDueDate} onChange={e => setNewDueDate(e.target.value)}
                   className="flex-1 px-2.5 py-1.5 rounded-lg font-notes text-xs outline-none"
                   style={{ background: '#f9f9f9', border: '1px solid hsl(30 25% 80%)', color: 'hsl(25 30% 15%)' }} />
                 <button onClick={addTask}
@@ -256,7 +260,7 @@ export default function GoalCard({ goal, tasks, isFirst, isLast, onMove, onEdit,
         </div>
       </div>
 
-      {/* Hover tooltip s komentářem */}
+      {/* Hover tooltip */}
       {tooltipPos && comment && (
         <div style={{
           position: 'fixed', top: tooltipPos.top, left: tooltipPos.left,
@@ -271,7 +275,7 @@ export default function GoalCard({ goal, tasks, isFirst, isLast, onMove, onEdit,
         </div>
       )}
 
-      {/* Modál pro editaci komentáře */}
+      {/* Editace komentáře */}
       {editingComment && (
         <div className="fixed inset-0 flex items-center justify-center z-[60] px-4"
           style={{ background: 'rgba(0,0,0,0.35)' }}
@@ -280,13 +284,10 @@ export default function GoalCard({ goal, tasks, isFirst, isLast, onMove, onEdit,
             style={{ border: '1px solid #e0e0e0', background: '#fff' }}
             onClick={e => e.stopPropagation()}>
             <p className="font-hand mb-1" style={{ fontSize: '1.5rem', color: 'hsl(25 30% 15%)' }}>Poznámka</p>
-            <p className="font-notes text-xs mb-3" style={{ color: 'hsl(25 15% 52%)' }}>{goal.title}</p>
+            <p className="font-notes text-xs mb-3" style={{ color: 'hsl(25 15% 52%)' }}>{goal.nazev}</p>
             <textarea
-              value={commentDraft}
-              onChange={e => setCommentDraft(e.target.value)}
-              rows={4}
-              placeholder="Sem si napiš poznámku ke cíli…"
-              autoFocus
+              value={commentDraft} onChange={e => setCommentDraft(e.target.value)}
+              rows={4} placeholder="Sem si napiš poznámku ke cíli…" autoFocus
               onKeyDown={e => { if (e.key === 'Escape') { setEditingComment(false); setCommentDraft(comment) } }}
               className="w-full font-notes text-sm outline-none resize-none rounded-xl"
               style={{ background: '#f9f9f9', border: '1px solid hsl(30 25% 80%)', color: 'hsl(25 30% 15%)', padding: '10px 12px' }}
@@ -294,14 +295,10 @@ export default function GoalCard({ goal, tasks, isFirst, isLast, onMove, onEdit,
             <div className="flex gap-2 mt-3">
               <button onClick={saveComment}
                 className="flex-1 py-2.5 rounded-xl font-notes text-sm"
-                style={{ background: 'hsl(25 30% 15%)', color: 'hsl(40 35% 95%)' }}>
-                Uložit
-              </button>
+                style={{ background: 'hsl(25 30% 15%)', color: 'hsl(40 35% 95%)' }}>Uložit</button>
               <button onClick={() => { setEditingComment(false); setCommentDraft(comment) }}
                 className="flex-1 py-2.5 rounded-xl font-notes text-sm"
-                style={{ border: '1px solid #e0e0e0', background: '#f9f9f9', color: 'hsl(25 30% 15%)' }}>
-                Zrušit
-              </button>
+                style={{ border: '1px solid #e0e0e0', background: '#f9f9f9', color: 'hsl(25 30% 15%)' }}>Zrušit</button>
             </div>
           </div>
         </div>
@@ -313,11 +310,9 @@ export default function GoalCard({ goal, tasks, isFirst, isLast, onMove, onEdit,
           style={{ background: 'rgba(0,0,0,0.4)' }}>
           <div className="paper-card rounded-2xl shadow-2xl w-full max-w-xs p-6 text-center"
             style={{ border: '1px solid #e0e0e0', background: '#fff' }}>
-            <p className="font-hand mb-2" style={{ fontSize: '1.6rem', color: 'hsl(25 30% 15%)' }}>
-              Smazat cíl?
-            </p>
+            <p className="font-hand mb-2" style={{ fontSize: '1.6rem', color: 'hsl(25 30% 15%)' }}>Smazat cíl?</p>
             <p className="font-notes text-sm mb-6" style={{ color: 'hsl(25 15% 50%)' }}>
-              „{goal.title}" a všechny jeho úkoly budou smazány.
+              „{goal.nazev}" a všechny jeho úkoly budou smazány.
             </p>
             <div className="flex gap-2">
               <button onClick={() => setConfirmDelete(false)}
@@ -325,7 +320,11 @@ export default function GoalCard({ goal, tasks, isFirst, isLast, onMove, onEdit,
                 style={{ border: '1px solid #e0e0e0', background: '#f9f9f9', color: 'hsl(25 30% 15%)' }}>
                 Zrušit
               </button>
-              <button onClick={async () => { await supabase.from('goals').delete().eq('id', goal.id); onDeleted() }}
+              <button onClick={async () => {
+                await supabase.from('ukoly').delete().eq('projekt_id', goal.id)
+                await supabase.from('ukoly_projekty').delete().eq('id', goal.id)
+                onDeleted()
+              }}
                 className="flex-1 py-2.5 rounded-xl font-notes text-sm"
                 style={{ background: 'hsl(0 60% 48%)', color: 'white' }}>
                 Smazat

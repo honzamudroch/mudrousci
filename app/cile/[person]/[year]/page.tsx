@@ -9,13 +9,13 @@ import GoalCard from '@/components/GoalCard'
 import AddGoalModal from '@/components/AddGoalModal'
 
 interface Goal {
-  id: string; person: string; year: number; title: string
-  description: string | null; image_url: string | null; comment: string | null
+  id: string; person: string; rok: number; nazev: string
+  popis: string | null; image_url: string | null; comment: string | null
   status: 'todo' | 'in-progress' | 'done'; order_idx: number
 }
 interface GoalTask {
-  id: string; goal_id: string; title: string
-  deadline: string | null; status: 'todo' | 'in-progress' | 'done'; order_idx: number
+  id: string; projekt_id: string; nazev: string
+  due_date: string | null; status: 'todo' | 'in-progress' | 'done'; order_idx: number
 }
 
 const STATUS_BORDER = {
@@ -31,7 +31,6 @@ const STATUS_IMG_BG = {
 
 const LABELS: Record<string, string> = { honza: 'Honza', lucka: 'Lucka' }
 
-// Ikona mřížky
 const GridIcon = ({ active }: { active: boolean }) => (
   <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
     <rect x="1" y="1" width="6" height="6" rx="1.5" fill={active ? 'hsl(25 30% 15%)' : 'hsl(25 15% 65%)'}/>
@@ -41,7 +40,6 @@ const GridIcon = ({ active }: { active: boolean }) => (
   </svg>
 )
 
-// Ikona listu
 const ListIcon = ({ active }: { active: boolean }) => (
   <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
     <rect x="1" y="2" width="16" height="3.5" rx="1.5" fill={active ? 'hsl(25 30% 15%)' : 'hsl(25 15% 65%)'}/>
@@ -67,11 +65,15 @@ export default function GoalsPage() {
 
   const loadData = async () => {
     const [{ data: goalsData }, { data: tasksData }] = await Promise.all([
-      supabase.from('goals').select('*').eq('person', person).eq('year', year).order('order_idx'),
-      supabase.from('goal_tasks').select('*').order('order_idx'),
+      supabase.from('ukoly_projekty').select('*')
+        .eq('person', person).eq('rok', year).eq('typ', 'rocni_cil')
+        .order('order_idx'),
+      supabase.from('ukoly').select('*').eq('person', person).order('order_idx'),
     ])
-    setGoals(goalsData ?? [])
-    setTasks(tasksData ?? [])
+    const fetched = goalsData ?? []
+    setGoals(fetched)
+    const goalIds = new Set(fetched.map((g: any) => g.id))
+    setTasks((tasksData ?? []).filter((t: any) => goalIds.has(t.projekt_id)))
     setLoading(false)
   }
 
@@ -86,8 +88,8 @@ export default function GoalsPage() {
     ;[updated[idx], updated[swapIdx]] = [updated[swapIdx], updated[idx]]
     setGoals(updated)
     await Promise.all([
-      supabase.from('goals').update({ order_idx: b.order_idx }).eq('id', a.id),
-      supabase.from('goals').update({ order_idx: a.order_idx }).eq('id', b.id),
+      supabase.from('ukoly_projekty').update({ order_idx: b.order_idx }).eq('id', a.id),
+      supabase.from('ukoly_projekty').update({ order_idx: a.order_idx }).eq('id', b.id),
     ])
   }
 
@@ -105,7 +107,7 @@ export default function GoalsPage() {
       <Header />
       <main className="flex-1 mx-auto max-w-5xl w-full px-4 md:px-8 py-6 md:py-8">
 
-<div className="flex items-center gap-3 mb-8 flex-wrap">
+        <div className="flex items-center gap-3 mb-8 flex-wrap">
           <button onClick={() => router.push('/cile')}
             className="font-notes text-sm px-3 py-1.5 rounded-lg shrink-0"
             style={{ background: '#f5f0ea', color: 'hsl(25 30% 15%)' }}>
@@ -115,7 +117,6 @@ export default function GoalsPage() {
             {personLabel} — cíle {year}
           </h1>
 
-          {/* Toggle pohled */}
           <div className="flex rounded-xl overflow-hidden shrink-0"
             style={{ border: '1px solid #e0e0e0', background: '#f9f9f9' }}>
             <button
@@ -165,6 +166,7 @@ export default function GoalsPage() {
           <div className="grid gap-4" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))' }}>
             {sortedGoals.map(goal => {
               const borderColor = STATUS_BORDER[goal.status]
+              const goalTasks = tasks.filter(t => t.projekt_id === goal.id)
               return (
                 <div
                   key={goal.id}
@@ -189,12 +191,12 @@ export default function GoalsPage() {
                   </div>
                   <div className="px-3 py-2.5" style={{ borderTop: `2px solid ${borderColor}20` }}>
                     <p className="font-hand leading-tight" style={{ fontSize: '1.05rem', color: 'hsl(25 30% 15%)' }}>
-                      {goal.title}
+                      {goal.nazev}
                     </p>
                     <p className="font-notes text-xs mt-0.5" style={{ color: 'hsl(25 15% 55%)' }}>
-                      {tasks.filter(t => t.goal_id === goal.id).length} podcílů
-                      {tasks.filter(t => t.goal_id === goal.id && t.status === 'done').length > 0 &&
-                        ` · ${tasks.filter(t => t.goal_id === goal.id && t.status === 'done').length} hotovo`}
+                      {goalTasks.length} podcílů
+                      {goalTasks.filter(t => t.status === 'done').length > 0 &&
+                        ` · ${goalTasks.filter(t => t.status === 'done').length} hotovo`}
                     </p>
                   </div>
                 </div>
@@ -210,7 +212,7 @@ export default function GoalsPage() {
               <GoalCard
                 key={goal.id}
                 goal={goal}
-                tasks={tasks.filter(t => t.goal_id === goal.id)}
+                tasks={tasks.filter(t => t.projekt_id === goal.id)}
                 isFirst={i === 0}
                 isLast={i === sortedGoals.length - 1}
                 onMove={dir => moveGoal(goal.id, dir)}
@@ -226,7 +228,7 @@ export default function GoalsPage() {
       {selectedGoal && (
         <GoalDetailModal
           goal={selectedGoal}
-          tasks={tasks.filter(t => t.goal_id === selectedGoal.id)}
+          tasks={tasks.filter(t => t.projekt_id === selectedGoal.id)}
           onClose={() => setSelectedGoal(null)}
           onEdit={() => { setEditGoal(selectedGoal); setShowAddGoal(true); setSelectedGoal(null) }}
           onDeleted={() => { setSelectedGoal(null); loadData() }}

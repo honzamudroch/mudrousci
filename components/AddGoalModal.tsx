@@ -5,8 +5,8 @@ import { createClient } from '@/lib/supabase'
 import { compressImage } from '@/lib/imageUtils'
 
 interface Goal {
-  id: string; person: string; year: number; title: string
-  description: string | null; image_url: string | null
+  id: string; person: string; rok: number; nazev: string
+  popis: string | null; image_url: string | null
   status: 'todo' | 'in-progress' | 'done'; order_idx: number
 }
 
@@ -27,8 +27,8 @@ const STATUS_OPTIONS = [
 
 export default function AddGoalModal({ person, year, editGoal, onClose, onSaved }: Props) {
   const isEdit = !!editGoal
-  const [title, setTitle] = useState(editGoal?.title ?? '')
-  const [description, setDescription] = useState(editGoal?.description ?? '')
+  const [nazev, setNazev] = useState(editGoal?.nazev ?? '')
+  const [popis, setPopis] = useState(editGoal?.popis ?? '')
   const [status, setStatus] = useState<'todo' | 'in-progress' | 'done'>(editGoal?.status ?? 'todo')
   const [imageUrl, setImageUrl] = useState<string | null>(editGoal?.image_url ?? null)
   const [imageFile, setImageFile] = useState<File | null>(null)
@@ -61,18 +61,18 @@ export default function AddGoalModal({ person, year, editGoal, onClose, onSaved 
       }
 
       if (isEdit) {
-        const { error } = await supabase.from('goals')
-          .update({ title, description: description || null, status, image_url: finalImageUrl })
+        const { error: updateErr } = await supabase.from('ukoly_projekty')
+          .update({ nazev, popis: popis || null, status, image_url: finalImageUrl })
           .eq('id', editGoal!.id)
-        if (error) throw error
+        if (updateErr) throw updateErr
       } else {
-        const { data: existing } = await supabase.from('goals')
-          .select('order_idx').eq('person', person).eq('year', year)
+        const { data: existing } = await supabase.from('ukoly_projekty')
+          .select('order_idx').eq('person', person).eq('rok', year).eq('typ', 'rocni_cil')
           .order('order_idx', { ascending: false }).limit(1)
         const nextOrder = (existing?.[0]?.order_idx ?? -1) + 1
-        const { error } = await supabase.from('goals')
-          .insert({ person, year, title, description: description || null, status, image_url: finalImageUrl, order_idx: nextOrder })
-        if (error) throw error
+        const { error: insertErr } = await supabase.from('ukoly_projekty')
+          .insert({ person, rok: year, nazev, popis: popis || null, status, image_url: finalImageUrl, order_idx: nextOrder, typ: 'rocni_cil' })
+        if (insertErr) throw insertErr
       }
 
       setLoading(false)
@@ -103,14 +103,14 @@ export default function AddGoalModal({ person, year, editGoal, onClose, onSaved 
             <div>
               <label className="block font-notes text-xs uppercase tracking-widest mb-1.5"
                 style={{ color: 'hsl(25 15% 50%)' }}>Název</label>
-              <input type="text" value={title} onChange={e => setTitle(e.target.value)}
+              <input type="text" value={nazev} onChange={e => setNazev(e.target.value)}
                 className={inputCls} style={inputStyle} required placeholder="Naučit se španělsky…" />
             </div>
 
             <div>
               <label className="block font-notes text-xs uppercase tracking-widest mb-1.5"
                 style={{ color: 'hsl(25 15% 50%)' }}>Popis</label>
-              <textarea value={description} onChange={e => setDescription(e.target.value)}
+              <textarea value={popis} onChange={e => setPopis(e.target.value)}
                 className={inputCls + ' resize-none'} style={inputStyle}
                 placeholder="Proč a jak…" rows={3} />
             </div>

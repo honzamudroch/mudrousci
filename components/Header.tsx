@@ -15,7 +15,7 @@ export default function Header({ countLabel }: { countLabel?: string } = {}) {
   }
 
   const linkClass = (path: string) => {
-    const active = pathname === path || (path === '/cile' && pathname.startsWith('/cile/'))
+    const active = pathname === path || (path === '/cile' && pathname.startsWith('/cile/')) || (path === '/plan' && pathname.startsWith('/plan'))
     return active
       ? 'font-hand text-2xl transition-colors ink-underline'
       : 'font-hand text-2xl transition-colors hover:opacity-60'
@@ -56,7 +56,7 @@ export default function Header({ countLabel }: { countLabel?: string } = {}) {
           </button>
           <button onClick={() => router.push('/timeline')} className={linkClass('/timeline')}
             style={{color: 'hsl(25 30% 15%)'}}>
-            Časová osa
+            Osa
           </button>
           <button onClick={() => router.push('/foto')} className={linkClass('/foto')}
             style={{color: 'hsl(25 30% 15%)'}}>
@@ -69,6 +69,14 @@ export default function Header({ countLabel }: { countLabel?: string } = {}) {
           <button onClick={() => router.push('/navyky')} className={linkClass('/navyky')}
             style={{color: 'hsl(25 30% 15%)'}}>
             Návyky
+          </button>
+          <button onClick={() => router.push('/ukoly')} className={linkClass('/ukoly')}
+            style={{color: 'hsl(25 30% 15%)'}}>
+            Úkoly
+          </button>
+          <button onClick={() => router.push('/plan')} className={linkClass('/plan')}
+            style={{color: 'hsl(25 30% 15%)'}}>
+            Plán
           </button>
           <button onClick={handleLogout}
             className="font-notes text-sm underline decoration-dotted"
@@ -115,7 +123,7 @@ export default function Header({ countLabel }: { countLabel?: string } = {}) {
           </button>
           <button onClick={() => { router.push('/timeline'); setMenuOpen(false) }}
             className={linkClass('/timeline')} style={{color: 'hsl(25 30% 15%)', textAlign: 'left'}}>
-            Časová osa
+            Osa
           </button>
           <button onClick={() => { router.push('/foto'); setMenuOpen(false) }}
             className={linkClass('/foto')} style={{color: 'hsl(25 30% 15%)', textAlign: 'left'}}>
@@ -128,6 +136,14 @@ export default function Header({ countLabel }: { countLabel?: string } = {}) {
           <button onClick={() => { router.push('/navyky'); setMenuOpen(false) }}
             className={linkClass('/navyky')} style={{color: 'hsl(25 30% 15%)', textAlign: 'left'}}>
             Návyky
+          </button>
+          <button onClick={() => { router.push('/ukoly'); setMenuOpen(false) }}
+            className={linkClass('/ukoly')} style={{color: 'hsl(25 30% 15%)', textAlign: 'left'}}>
+            Úkoly
+          </button>
+          <button onClick={() => { router.push('/plan'); setMenuOpen(false) }}
+            className={linkClass('/plan')} style={{color: 'hsl(25 30% 15%)', textAlign: 'left'}}>
+            Plán
           </button>
           <button onClick={handleLogout}
             className="font-notes text-sm underline decoration-dotted text-left"
