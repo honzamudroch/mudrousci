@@ -35,7 +35,7 @@ export default function CilePage() {
               }}
               onClick={() => router.push(`/cile/${tile.person}/${tile.year}`)}
             >
-              <div style={{ height: 180, overflow: 'hidden', background: '#fff' }}>
+              <div style={{ height: 300, overflow: 'hidden', background: '#fff' }}>
                 <img
                   src={tile.person === 'honza' ? '/honza-header.png' : '/lucka-header.png'}
                   alt=""
