@@ -5,7 +5,7 @@ import { createClient } from '@/lib/supabase'
 
 interface Goal {
   id: string; person: string; year: number; title: string
-  description: string | null; image_url: string | null
+  description: string | null; image_url: string | null; comment: string | null
   status: 'todo' | 'in-progress' | 'done'; order_idx: number
 }
 interface GoalTask {

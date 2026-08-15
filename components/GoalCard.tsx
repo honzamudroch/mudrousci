@@ -5,7 +5,7 @@ import { createClient } from '@/lib/supabase'
 
 interface Goal {
   id: string; person: string; year: number; title: string
-  description: string | null; image_url: string | null
+  description: string | null; image_url: string | null; comment: string | null
   status: 'todo' | 'in-progress' | 'done'; order_idx: number
 }
 interface GoalTask {
@@ -43,8 +43,25 @@ export default function GoalCard({ goal, tasks, isFirst, isLast, onMove, onEdit,
   const [newDeadline, setNewDeadline] = useState('')
   const [addingTask, setAddingTask] = useState(false)
   const [confirmDelete, setConfirmDelete] = useState(false)
+  const [comment, setComment] = useState(goal.comment ?? '')
+  const [commentDraft, setCommentDraft] = useState(goal.comment ?? '')
+  const [editingComment, setEditingComment] = useState(false)
+  const [tooltipPos, setTooltipPos] = useState<{ top: number; left: number } | null>(null)
   const supabase = createClient()
   const s = STATUS[goal.status]
+
+  const saveComment = async () => {
+    const val = commentDraft.trim() || null
+    await supabase.from('goals').update({ comment: val }).eq('id', goal.id)
+    setComment(commentDraft.trim())
+    setEditingComment(false)
+  }
+
+  const handleCommentEnter = (e: React.MouseEvent<HTMLButtonElement>) => {
+    if (!comment) return
+    const r = e.currentTarget.getBoundingClientRect()
+    setTooltipPos({ top: r.top, left: r.left })
+  }
 
   const addTask = async () => {
     if (!newTitle.trim()) return
@@ -118,6 +135,19 @@ export default function GoalCard({ goal, tasks, isFirst, isLast, onMove, onEdit,
               style={{ border: '1px solid #fca5a5', background: '#fff5f5', color: 'hsl(0 60% 48%)' }}>
               Smazat
             </button>
+            <button
+              className="w-6 h-6 rounded-lg flex items-center justify-center text-xs"
+              style={{
+                background: comment ? 'hsl(38 80% 93%)' : '#f0f0f0',
+                color: comment ? 'hsl(38 80% 38%)' : 'hsl(25 15% 60%)',
+                border: `1px solid ${comment ? 'hsl(38 80% 65%)' : '#e0e0e0'}`,
+                flexShrink: 0,
+              }}
+              onMouseEnter={handleCommentEnter}
+              onMouseLeave={() => setTooltipPos(null)}
+              onClick={() => { setCommentDraft(comment); setEditingComment(true) }}
+              title={comment ? undefined : 'Přidat poznámku'}
+            >✍</button>
             <div className="flex gap-1 ml-auto">
               {!isFirst && (
                 <button onClick={() => onMove('up')}
@@ -225,6 +255,57 @@ export default function GoalCard({ goal, tasks, isFirst, isLast, onMove, onEdit,
           )}
         </div>
       </div>
+
+      {/* Hover tooltip s komentářem */}
+      {tooltipPos && comment && (
+        <div style={{
+          position: 'fixed', top: tooltipPos.top, left: tooltipPos.left,
+          transform: 'translateY(calc(-100% - 6px))',
+          zIndex: 9999, background: '#fff', border: '1px solid #e0e0e0',
+          borderRadius: 10, padding: '8px 12px', maxWidth: 260,
+          boxShadow: '0 4px 14px rgba(0,0,0,0.12)',
+          fontSize: '0.78rem', color: 'hsl(25 30% 18%)', whiteSpace: 'pre-wrap',
+          wordBreak: 'break-word', fontFamily: 'inherit', pointerEvents: 'none',
+        }}>
+          {comment}
+        </div>
+      )}
+
+      {/* Modál pro editaci komentáře */}
+      {editingComment && (
+        <div className="fixed inset-0 flex items-center justify-center z-[60] px-4"
+          style={{ background: 'rgba(0,0,0,0.35)' }}
+          onClick={() => { setEditingComment(false); setCommentDraft(comment) }}>
+          <div className="paper-card rounded-2xl shadow-2xl w-full max-w-sm p-6"
+            style={{ border: '1px solid #e0e0e0', background: '#fff' }}
+            onClick={e => e.stopPropagation()}>
+            <p className="font-hand mb-1" style={{ fontSize: '1.5rem', color: 'hsl(25 30% 15%)' }}>Poznámka</p>
+            <p className="font-notes text-xs mb-3" style={{ color: 'hsl(25 15% 52%)' }}>{goal.title}</p>
+            <textarea
+              value={commentDraft}
+              onChange={e => setCommentDraft(e.target.value)}
+              rows={4}
+              placeholder="Sem si napiš poznámku ke cíli…"
+              autoFocus
+              onKeyDown={e => { if (e.key === 'Escape') { setEditingComment(false); setCommentDraft(comment) } }}
+              className="w-full font-notes text-sm outline-none resize-none rounded-xl"
+              style={{ background: '#f9f9f9', border: '1px solid hsl(30 25% 80%)', color: 'hsl(25 30% 15%)', padding: '10px 12px' }}
+            />
+            <div className="flex gap-2 mt-3">
+              <button onClick={saveComment}
+                className="flex-1 py-2.5 rounded-xl font-notes text-sm"
+                style={{ background: 'hsl(25 30% 15%)', color: 'hsl(40 35% 95%)' }}>
+                Uložit
+              </button>
+              <button onClick={() => { setEditingComment(false); setCommentDraft(comment) }}
+                className="flex-1 py-2.5 rounded-xl font-notes text-sm"
+                style={{ border: '1px solid #e0e0e0', background: '#f9f9f9', color: 'hsl(25 30% 15%)' }}>
+                Zrušit
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Potvrzení smazání */}
       {confirmDelete && (
