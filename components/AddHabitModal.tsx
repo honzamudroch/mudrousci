@@ -6,7 +6,8 @@ import { createClient } from '@/lib/supabase'
 interface Category { id: string; name: string; color: string; icon: string }
 interface Habit {
   id: string; person: 'honza' | 'lucka'; category_id: string | null
-  title: string; times_per_day: number; emoji: string | null; order_idx: number; archived: boolean
+  title: string; times_per_day: number; emoji: string | null
+  order_idx: number; archived: boolean; frequency_type: 'daily' | 'weekly'
 }
 interface Props {
   categories: Category[]
@@ -21,10 +22,14 @@ export default function AddHabitModal({ categories, editHabit, onClose, onSaved 
   const [title, setTitle] = useState(editHabit?.title ?? '')
   const [person, setPerson] = useState<'honza' | 'lucka'>(editHabit?.person ?? 'honza')
   const [categoryId, setCategoryId] = useState(editHabit?.category_id ?? '')
-  const [timesPerDay, setTimesPerDay] = useState(editHabit?.times_per_day ?? 1)
+  const [freqType, setFreqType] = useState<'daily' | 'weekly'>(editHabit?.frequency_type ?? 'daily')
+  const [target, setTarget] = useState(editHabit?.times_per_day ?? 1)
   const [emoji, setEmoji] = useState(editHabit?.emoji ?? '')
   const [saving, setSaving] = useState(false)
   const supabase = createClient()
+
+  const dailyOptions = [1, 2, 3]
+  const weeklyOptions = [1, 2, 3, 4, 5, 6, 7]
 
   const save = async () => {
     if (!title.trim()) return
@@ -32,7 +37,8 @@ export default function AddHabitModal({ categories, editHabit, onClose, onSaved 
     const payload = {
       person, title: title.trim(),
       category_id: categoryId || null,
-      times_per_day: timesPerDay,
+      times_per_day: target,
+      frequency_type: freqType,
       emoji: emoji || null,
     }
     if (editHabit) {
@@ -119,16 +125,34 @@ export default function AddHabitModal({ categories, editHabit, onClose, onSaved 
           </select>
         </div>
 
-        {/* Kolikrát denně */}
-        <div className="mb-5">
-          <label className="font-notes text-xs mb-1.5 block" style={{ color: 'hsl(25 15% 55%)' }}>Kolikrát denně</label>
-          <div className="flex gap-2">
-            {[1, 2, 3].map(n => (
-              <button key={n} onClick={() => setTimesPerDay(n)}
-                className="flex-1 py-2.5 rounded-xl font-notes text-sm"
+        {/* Frekvence — Denně / Týdně */}
+        <div className="mb-3">
+          <label className="font-notes text-xs mb-1.5 block" style={{ color: 'hsl(25 15% 55%)' }}>Frekvence</label>
+          <div className="flex rounded-xl overflow-hidden mb-2.5" style={{ border: '1px solid #e0e0e0' }}>
+            {(['daily', 'weekly'] as const).map((f, i) => (
+              <button key={f} onClick={() => { setFreqType(f); setTarget(1) }}
+                className="flex-1 py-2.5 font-notes text-sm transition-colors"
                 style={{
-                  background: timesPerDay === n ? 'hsl(25 30% 15%)' : '#f0f0f0',
-                  color: timesPerDay === n ? 'hsl(40 35% 95%)' : 'hsl(25 30% 15%)',
+                  background: freqType === f ? 'hsl(25 30% 15%)' : '#f9f9f9',
+                  color: freqType === f ? 'hsl(40 35% 95%)' : 'hsl(25 30% 15%)',
+                  borderRight: i === 0 ? '1px solid #e0e0e0' : undefined,
+                }}>
+                {f === 'daily' ? 'Denně' : 'Týdně'}
+              </button>
+            ))}
+          </div>
+
+          <label className="font-notes text-xs mb-1.5 block" style={{ color: 'hsl(25 15% 55%)' }}>
+            {freqType === 'daily' ? 'Kolikrát denně' : 'Kolikrát za týden'}
+          </label>
+          <div className="flex gap-1.5 flex-wrap">
+            {(freqType === 'daily' ? dailyOptions : weeklyOptions).map(n => (
+              <button key={n} onClick={() => setTarget(n)}
+                className="flex-1 py-2 rounded-xl font-notes text-sm"
+                style={{
+                  minWidth: 36,
+                  background: target === n ? 'hsl(25 30% 15%)' : '#f0f0f0',
+                  color: target === n ? 'hsl(40 35% 95%)' : 'hsl(25 30% 15%)',
                 }}>
                 {n}×
               </button>
@@ -136,7 +160,7 @@ export default function AddHabitModal({ categories, editHabit, onClose, onSaved 
           </div>
         </div>
 
-        <div className="flex gap-2">
+        <div className="flex gap-2 mt-5">
           <button onClick={onClose}
             className="flex-1 py-2.5 rounded-xl font-notes text-sm"
             style={{ border: '1px solid #e0e0e0', background: '#f9f9f9', color: 'hsl(25 30% 15%)' }}>
