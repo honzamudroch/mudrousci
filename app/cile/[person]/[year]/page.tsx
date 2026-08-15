@@ -105,10 +105,10 @@ export default function GoalsPage() {
       <Header />
       <main className="flex-1 mx-auto max-w-5xl w-full px-4 md:px-8 py-6 md:py-8">
 
-        {person === 'lucka' && (
+        {(person === 'lucka' || person === 'honza') && (
           <div className="relative w-full mb-2 overflow-hidden rounded-2xl"
             style={{ height: 180, background: 'hsl(25 15% 94%)' }}>
-            <img src="/lucka-header.png" alt=""
+            <img src={person === 'lucka' ? '/lucka-header.png' : '/honza-header.png'} alt=""
               style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 20%' }} />
           </div>
         )}
