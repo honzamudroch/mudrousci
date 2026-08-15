@@ -39,7 +39,7 @@ export default function CilePage() {
                 <img
                   src={tile.person === 'honza' ? '/honza-header.png' : '/lucka-header.png'}
                   alt=""
-                  style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 20%' }}
+                  style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 20%', mixBlendMode: 'multiply' }}
                 />
               </div>
 
