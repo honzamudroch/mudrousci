@@ -177,12 +177,19 @@ export default function NavykyPage() {
               return (
                 <tr key={habit.id} style={{ background: idx % 2 === 0 ? 'transparent' : 'hsl(25 10% 97%)' }}>
                   <td style={{ padding: '7px 10px 7px 0' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
                       {habit.emoji && <span style={{ fontSize: '1rem', lineHeight: 1, flexShrink: 0 }}>{habit.emoji}</span>}
                       <span className="font-notes" style={{
                         fontSize: '0.82rem', color: 'hsl(25 30% 15%)', lineHeight: 1.2,
-                        overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 90,
+                        overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1, minWidth: 0,
                       }} title={habit.title}>{habit.title}</span>
+                      <button
+                        className="opacity-20 hover:opacity-80 transition-opacity shrink-0"
+                        onClick={e => { e.stopPropagation(); setEditHabit(habit); setShowAdd(true) }}
+                        style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '2px', fontSize: '0.7rem', lineHeight: 1 }}
+                        title="Upravit zvyk">
+                        ✏️
+                      </button>
                     </div>
                   </td>
                   {weekDays.map(date => {
