@@ -182,7 +182,7 @@ export default function GoalsPage() {
                   }}>
                     {goal.image_url ? (
                       <img src={goal.image_url} alt=""
-                        style={{ width: '100%', height: '100%', objectFit: 'contain', padding: 10 }} />
+                        style={{ width: '100%', height: '100%', objectFit: 'contain', padding: 10, mixBlendMode: 'multiply' }} />
                     ) : (
                       <span style={{ fontSize: '2.5rem' }}>🎯</span>
                     )}

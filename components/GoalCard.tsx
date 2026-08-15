@@ -83,7 +83,7 @@ export default function GoalCard({ goal, tasks, isFirst, isLast, onMove, onEdit,
         }}>
           {goal.image_url ? (
             <img src={goal.image_url} alt=""
-              style={{ width: '100%', height: '100%', objectFit: 'contain', padding: '10px' }} />
+              style={{ width: '100%', height: '100%', objectFit: 'contain', padding: '10px', mixBlendMode: 'multiply' }} />
           ) : (
             <span style={{ fontSize: '2.2rem' }}>🎯</span>
           )}

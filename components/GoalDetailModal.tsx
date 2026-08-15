@@ -87,7 +87,7 @@ export default function GoalDetailModal({ goal, tasks, onClose, onEdit, onDelete
             {goal.image_url ? (
               <div style={{ borderRadius: 10, overflow: 'hidden', background: 'hsl(38 35% 93%)', aspectRatio: '1/1' }}>
                 <img src={goal.image_url} alt=""
-                  style={{ width: '100%', height: '100%', objectFit: 'contain', padding: 8 }} />
+                  style={{ width: '100%', height: '100%', objectFit: 'contain', padding: 8, mixBlendMode: 'multiply' }} />
               </div>
             ) : (
               <div style={{ borderRadius: 10, background: 'hsl(38 35% 93%)', aspectRatio: '1/1', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '3rem' }}>
