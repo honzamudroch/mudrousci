@@ -35,16 +35,12 @@ export default function CilePage() {
               }}
               onClick={() => router.push(`/cile/${tile.person}/${tile.year}`)}
             >
-              {/* Placeholder — nahradit obrázkem až bude k dispozici */}
-              <div style={{
-                height: 220,
-                background: 'hsl(38 35% 90%)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: '5rem',
-              }}>
-                {tile.person === 'honza' ? '🧭' : '🌸'}
+              <div style={{ height: 220, overflow: 'hidden', background: 'hsl(38 35% 90%)' }}>
+                <img
+                  src={tile.person === 'honza' ? '/honza-header.png' : '/lucka-header.png'}
+                  alt=""
+                  style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 20%' }}
+                />
               </div>
 
               {/* Polaroid popisek */}
