@@ -340,7 +340,6 @@ export default function ObytnakPage() {
       <main className="flex-1 mx-auto max-w-3xl w-full px-4 md:px-8 py-10 flex flex-col gap-10">
         <div>
           <h1 className="font-hand text-center mb-2" style={{ fontSize: '3.5rem', color: INK }}>Obytňák</h1>
-          <p className="font-notes text-center" style={{ color: MUTED, fontSize: '1rem' }}>Šetříme na dodávku a její přestavbu</p>
         </div>
 
         {loading ? (
@@ -374,7 +373,7 @@ export default function ObytnakPage() {
                 </thead>
                 <tbody>
                   {([
-                    ['Naplánováno ve zdrojích', c.planovano, c.osoby.honza.planovano, c.osoby.lucka.planovano],
+                    ['Naplánováno', c.planovano, c.osoby.honza.planovano, c.osoby.lucka.planovano],
                     ['K dispozici', c.kDispozici, c.osoby.honza.kDispozici, c.osoby.lucka.kDispozici],
                     ['Vázané', c.vazane, c.osoby.honza.vazane, c.osoby.lucka.vazane],
                     ['Celkem vyděláno', c.nasetreno, c.osoby.honza.nasetreno, c.osoby.lucka.nasetreno],
@@ -389,7 +388,9 @@ export default function ObytnakPage() {
                 </tbody>
               </table>
               <div className="font-notes text-xs" style={{ color: MUTED }}>
-                Nenaplánováno zůstává {kc(Math.max(0, c.cil - c.planovano))}. Společné zdroje a vklady se dělí napůl.
+                {c.cil > c.planovano
+                  ? <>Musíme ještě naplánovat, jak našetříme <b style={{ color: INK }}>{kc(c.cil - c.planovano)}</b>.</>
+                  : 'Plán pokrývá celý cíl.'} Společné zdroje a vklady se dělí podle vkladů.
               </div>
             </section>
 
