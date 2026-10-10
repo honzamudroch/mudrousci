@@ -78,10 +78,12 @@ const ILUSTRACE: Partial<Record<Kampan, { src: string; width: number }>> = {
   auto: { src: '/11_van_scene_crop.png', width: 84 },
 }
 
-type Slot = { nahore: boolean; cx: number } // cx = střed popisku v px (může být posunutý od značky)
-const LW = 100, RADA_V = 62 // šířka popisku, výška řady popisků
+type Slot = { nahore: boolean; rada: number; cx: number } // cx = střed popisku v px (může být posunutý od značky)
+const RADA_V = 62 // výška jedné řady popisků
+const sirkaPopisku = (sirka: number) => sirka < 480 ? 74 : 100
 
 function PopisekMilniku({ m, x, slot, sirka, onHover }: { m: KampanStav['milniky'][number]; x: number; slot: Slot; sirka: number; onHover: (id: string | null) => void }) {
+  const LW = sirkaPopisku(sirka), uzke = sirka < 480
   const barva = m.dosazen ? HOTOVO : INK
   const strana = slot.nahore ? 'bottom' : 'top'
   const xpx = x / 100 * sirka
@@ -91,8 +93,8 @@ function PopisekMilniku({ m, x, slot, sirka, onHover }: { m: KampanStav['milniky
   const cil = Math.min(Math.max(xpx, levy + 6), pravy - 6)
   const poloha = (cil - levy) / LW
   const zarovnani: 'flex-start' | 'center' | 'flex-end' = poloha < 0.3 ? 'flex-start' : poloha > 0.7 ? 'flex-end' : 'center'
-  // spojka od pruhu k popisku: jedna šikmá, lehce "ručně" zvlněná tenká čára
-  const V = 15, L = Math.min(xpx, cil) - 6, W = Math.abs(cil - xpx) + 12
+  // spojka od pruhu k popisku: jedna šikmá, lehce "ručně" zvlněná tenká čára (u další řady delší)
+  const V = 15 + slot.rada * RADA_V, L = Math.min(xpx, cil) - 6, W = Math.abs(cil - xpx) + 12
   const x0 = xpx - L, x1 = cil - L
   const y0 = slot.nahore ? V : 0, y1 = slot.nahore ? 0 : V      // y0 u pruhu, y1 u popisku
   const dx = x1 - x0, dy = y1 - y0, w = dx === 0 ? 1.5 : 2.5
@@ -105,10 +107,10 @@ function PopisekMilniku({ m, x, slot, sirka, onHover }: { m: KampanStav['milniky
       <button type="button"
         onMouseEnter={() => onHover(m.id)} onMouseLeave={() => onHover(null)} onClick={() => onHover(m.id)}
         className="font-notes flex flex-col"
-        style={{ position: 'absolute', left: slot.cx, [strana]: 15, transform: 'translateX(-50%)', width: LW, fontSize: '0.75rem', lineHeight: 1.15,
+        style={{ position: 'absolute', left: slot.cx, [strana]: V, transform: 'translateX(-50%)', width: LW, fontSize: uzke ? '0.66rem' : '0.75rem', lineHeight: 1.15,
           color: barva, cursor: 'default', alignItems: zarovnani, textAlign: zarovnani === 'flex-start' ? 'left' : zarovnani === 'flex-end' ? 'right' : 'center',
           flexDirection: slot.nahore ? 'column-reverse' : 'column', background: '#fff', padding: '2px 0', zIndex: 1 }}>
-        <Ikona nazev={m.nazev} size={18} />
+        <Ikona nazev={m.nazev} size={uzke ? 15 : 18} />
         <span style={{ marginTop: slot.nahore ? 0 : 2, marginBottom: slot.nahore ? 2 : 0, borderBottom: `1px dotted ${MUTED}`, whiteSpace: 'nowrap' }}>{m.nazev}</span>
         <span style={{ fontWeight: 700 }}>{kcKratce(m.kumulativne)}</span>
       </button>
@@ -116,21 +118,32 @@ function PopisekMilniku({ m, x, slot, sirka, onHover }: { m: KampanStav['milniky
   )
 }
 
-// Střídá popisky nad a pod pruhem a v každé řadě je rozestrká do stran, aby se nepřekrývaly
-// (jedna řada nahoře, jedna dole; popisek se může posunout od své značky, spojí ho tečkovaná čárka).
+// Rozmístí popisky: střídavě nad a pod pruh, v řadě se smí trochu posunout do strany;
+// když se nevejde ani s posunem, otevře se další řada (na mobilu jich bývá víc).
 function rozmisti(milniky: KampanStav['milniky'], pct: (n: number) => number, sirka: number): Map<string, Slot> {
+  const LW = sirkaPopisku(sirka), MEZERA = 6, MAX_POSUN = LW * 0.7
+  const MIN = LW / 2, MAX = Math.max(MIN, sirka - LW / 2)
   const serazene = [...milniky].sort((a, b) => a.kumulativne - b.kumulativne)
+  const konec = new Map<string, number>() // klíč "nahore:rada" -> pravý okraj posledního popisku
   const out = new Map<string, Slot>()
-  const MEZERA = LW + 6, MIN = LW / 2, MAX = Math.max(MIN, sirka - LW / 2)
-  for (const nahore of [true, false]) {
-    const rada = serazene.filter((_, i) => (i % 2 === 0) === nahore)
-    const cx = rada.map(m => Math.min(MAX, Math.max(MIN, pct(m.kumulativne) / 100 * sirka)))
-    for (let i = 1; i < cx.length; i++) cx[i] = Math.max(cx[i], cx[i - 1] + MEZERA)          // odstrkat doprava
-    for (let i = cx.length - 1; i >= 0; i--) {                                                 // a zpět zleva, ať se vejdou do šířky
-      cx[i] = Math.min(cx[i], i === cx.length - 1 ? MAX : cx[i + 1] - MEZERA)
+  serazene.forEach((m, i) => {
+    const cx0 = Math.min(MAX, Math.max(MIN, pct(m.kumulativne) / 100 * sirka))
+    const pref = i % 2 === 0
+    const kandidati: [boolean, number][] = []
+    for (let r = 0; r < 4; r++) { kandidati.push([pref, r]); kandidati.push([!pref, r]) }
+    let umisteno: Slot | null = null
+    for (const [nahore, rada] of kandidati) {
+      const k = `${nahore}:${rada}`, posledni = konec.get(k) ?? -Infinity
+      const potreba = posledni + MEZERA + LW / 2
+      const cx = Math.max(cx0, potreba)
+      if (cx - cx0 <= MAX_POSUN && cx <= MAX) { umisteno = { nahore, rada, cx }; konec.set(k, cx + LW / 2); break }
     }
-    rada.forEach((m, i) => out.set(m.id, { nahore, cx: cx[i] }))
-  }
+    if (!umisteno) { // nouzově do poslední řady preferované strany, i kdyby se překrýval
+      const k = `${pref}:3`, cx = Math.min(MAX, Math.max(cx0, (konec.get(k) ?? -Infinity) + MEZERA + LW / 2))
+      umisteno = { nahore: pref, rada: 3, cx }; konec.set(k, cx + LW / 2)
+    }
+    out.set(m.id, umisteno)
+  })
   return out
 }
 
@@ -151,8 +164,8 @@ function CestaKampane({ k }: { k: KampanStav }) {
     return () => ro.disconnect()
   }, [])
   const sloty = rozmisti(popisky, pct, sirka)
-  const radNahore = popisky.some(m => sloty.get(m.id)!.nahore) ? 1 : 0
-  const radDole = popisky.some(m => !sloty.get(m.id)!.nahore) ? 1 : 0
+  const rad = (nahore: boolean) => Math.max(0, ...popisky.map(m => { const sl = sloty.get(m.id)!; return sl.nahore === nahore ? sl.rada + 1 : 0 }))
+  const radNahore = rad(true), radDole = rad(false)
   const il = ILUSTRACE[k.key]
   return (
     <div>
