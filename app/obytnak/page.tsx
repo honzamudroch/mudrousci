@@ -44,7 +44,7 @@ function Ikona({ nazev, size = 20 }: { nazev: string; size?: number }) {
   )
 }
 
-// ── Pruh: k dispozici (zelená) / vázané (šrafy) / chybí ──
+// ── Pruh: k dispozici (zelená) / na cestě (šrafy) / chybí ──
 function Pruh({ kDispozici, vazane, cil, vyska = 16, znacky, plan, popisek }: { kDispozici: number; vazane: number; cil: number; vyska?: number; znacky?: number[]; plan?: number; popisek?: string }) {
   const p = (n: number) => cil > 0 ? Math.min(100, n / cil * 100) : 0
   const konec = p(kDispozici + vazane)
@@ -221,7 +221,7 @@ function ZdrojKarta({ z, onEdit, onVklad, onEditVklad }: { z: ZdrojStav; onEdit:
       <Pruh kDispozici={z.kDispozici} vazane={z.vazane} cil={cil} vyska={10} />
       <div className="flex items-center gap-2 flex-wrap font-notes text-xs" style={{ color: MUTED }}>
         {z.kDispozici > 0 && <span>k dispozici {kc(z.kDispozici)}</span>}
-        {z.vazane > 0 && <span>· vázané {kc(z.vazane)}</span>}
+        {z.vazane > 0 && <span>· na cestě {kc(z.vazane)}</span>}
         {z.chybi > 0 ? <span>· chybí {kc(z.chybi)}</span> : <span>· splněno</span>}
       </div>
       {z.vklady.length > 0 && <div className="flex items-center gap-1.5 flex-wrap">
@@ -231,14 +231,14 @@ function ZdrojKarta({ z, onEdit, onVklad, onEditVklad }: { z: ZdrojStav; onEdit:
             <button onClick={() => onEditVklad(v)}
               className="font-notes text-xs px-2.5 py-1 rounded-lg"
               style={{ background: v.dostupnost === 'vazane' ? PROBIHA_SV : '#fff', border: `1px solid ${v.dostupnost === 'vazane' ? PROBIHA : HOTOVO}`, color: INK }}>
-              {v.person === 'spolecny' ? 'Oba' : OSOBA[v.person].label} · {kc(Number(v.castka))} <span style={{ color: MUTED }}>{cz(v.datum)}{v.dostupnost === 'vazane' ? ' · vázané' : ''}</span>
+              {v.person === 'spolecny' ? 'Oba' : OSOBA[v.person].label} · {kc(Number(v.castka))} <span style={{ color: MUTED }}>{cz(v.datum)}{v.dostupnost === 'vazane' ? ' · na cestě' : ''}</span>
             </button>
             {hoverVklad === v.id && (
               <div className="paper-card rounded-xl px-4 py-3 font-notes text-sm"
                 style={{ position: 'absolute', top: 'calc(100% + 6px)', left: 0, width: 260, border: '1px solid #e0e0e0', color: INK, zIndex: 5, pointerEvents: 'none' }}>
                 <div className="font-hand" style={{ fontSize: '1.3rem', lineHeight: 1.1 }}>{kc(Number(v.castka))}</div>
                 <div style={{ color: MUTED }}>
-                  {v.person === 'spolecny' ? 'Oba napůl' : OSOBA[v.person].label} · {cz(v.datum)} · {v.dostupnost === 'vazane' ? 'vázané, zatím nedostupné' : 'k dispozici'}
+                  {v.person === 'spolecny' ? 'Oba napůl' : OSOBA[v.person].label} · {cz(v.datum)} · {v.dostupnost === 'vazane' ? 'na cestě, zatím nedostupné' : 'k dispozici'}
                 </div>
                 {v.note && <div className="text-xs mt-1">{v.note}</div>}
                 <div className="text-xs mt-1" style={{ color: MUTED }}>Klikni pro úpravu.</div>
@@ -375,7 +375,7 @@ export default function ObytnakPage() {
                   {([
                     ['Naplánováno', c.planovano, c.osoby.honza.planovano, c.osoby.lucka.planovano],
                     ['K dispozici', c.kDispozici, c.osoby.honza.kDispozici, c.osoby.lucka.kDispozici],
-                    ['Vázané', c.vazane, c.osoby.honza.vazane, c.osoby.lucka.vazane],
+                    ['Na cestě', c.vazane, c.osoby.honza.vazane, c.osoby.lucka.vazane],
                     ['Celkem vyděláno', c.nasetreno, c.osoby.honza.nasetreno, c.osoby.lucka.nasetreno],
                   ] as [string, number, number, number][]).map(([label, a, h, l], i) => (
                     <tr key={label} style={{ borderTop: i === 3 ? `1px dashed #e0dbd4` : undefined, fontWeight: i === 3 ? 700 : 400 }}>
@@ -399,7 +399,7 @@ export default function ObytnakPage() {
             ))}
 
             <p className="font-notes text-xs text-center" style={{ color: MUTED }}>
-              Cíle milníků se počítají z položek rozpočtu v Base (střední odhad). Zelená = k dispozici, šrafovaná = vázané, světle šedá = naplánováno ve zdrojích, prázdné = nenaplánováno.
+              Cíle milníků se počítají z položek rozpočtu v Base (střední odhad). Zelená = k dispozici, šrafovaná = na cestě (vyděláno, ale zatím nedostupné), světle šedá = naplánováno, prázdné = nenaplánováno.
             </p>
           </>
         )}

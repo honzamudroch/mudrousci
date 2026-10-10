@@ -171,9 +171,9 @@ export function VkladModal({ init, me, userId, onClose, onSaved }: {
       </div>
       <div className="flex flex-col gap-1">
         <Label>Dostupnost</Label>
-        <Prepinac value={dostupnost} onChange={setDostupnost} volby={[{ key: 'k_dispozici' as Dostupnost, label: 'K dispozici' }, { key: 'vazane' as Dostupnost, label: 'Vázané' }]} />
+        <Prepinac value={dostupnost} onChange={setDostupnost} volby={[{ key: 'k_dispozici' as Dostupnost, label: 'K dispozici' }, { key: 'vazane' as Dostupnost, label: 'Na cestě' }]} />
         <p className="font-notes text-xs" style={{ color: 'hsl(25 15% 55%)' }}>
-          {dostupnost === 'vazane' ? 'Peníze jsou naše, ale zatím na ně nesáhneme (např. zaplacená garáž do prodeje).' : 'Můžeme je kdykoliv použít.'}
+          {dostupnost === 'vazane' ? 'Peníze jsou vydělané, ale zatím na ně nesáhneme (např. zaplacená garáž do prodeje).' : 'Můžeme je kdykoliv použít.'}
         </p>
       </div>
       <div className="flex flex-col gap-1">
