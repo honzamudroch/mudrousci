@@ -12,6 +12,7 @@ const SPOLECNE: Polozka[] = [
   { label: 'Osa',  path: '/timeline' },
   { label: 'Foto', path: '/foto' },
   { label: 'Cíle', path: '/cile' },
+  { label: 'Obytňák', path: '/obytnak' },
 ]
 
 const SKUPINY: Skupina[] = [
