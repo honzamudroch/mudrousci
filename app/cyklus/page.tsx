@@ -13,7 +13,6 @@ const INK = 'hsl(25 30% 15%)'
 const MUTED = 'hsl(25 15% 45%)'
 
 function cz(s: string) { const [, m, d] = s.split('-'); return `${+d}. ${+m}.` }
-function czPlus(s: string, nej: number) { return nej ? `${cz(s)} (± ${nej} d)` : cz(s) }
 
 // ── Kolo ──────────────────────────────────────────────────
 function polar(cx: number, cy: number, r: number, deg: number): [number, number] {
@@ -256,7 +255,7 @@ export default function CyklusPage() {
                 {m.dniDoMenstruace !== null && m.dalsiZacatek && (
                   <Stitek rot={0.8} barva={OBDOBI.menstruace.barva} nadpis="Další menstruace"
                     hodnota={m.dniDoMenstruace === 0 ? 'dnes' : `za ${m.dniDoMenstruace} ${m.dniDoMenstruace === 1 ? 'den' : m.dniDoMenstruace < 5 ? 'dny' : 'dní'}`}
-                    pozn={`očekávaný začátek ${czPlus(m.dalsiZacatek, m.dalsiNejistota)}`} />
+                    pozn={`očekávaný začátek ${cz(m.dalsiZacatek)}`} />
                 )}
               </div>
 
