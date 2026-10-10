@@ -45,6 +45,10 @@ function Kolo({ dny, denDnes, faze }: { dny: Den[]; denDnes: number; faze: Faze 
       <g filter="url(#ink)">
         {dny.map((d, i) => (
           <g key={d.date}>
+            {d.faze === 'menstruace' && (
+              <path d={arc(C, C, R, angle(i) + gap / 2, angle(i + 1) - gap / 2)}
+                stroke={INK} strokeWidth={W + 3.5} fill="none" strokeLinecap="butt" />
+            )}
             <path d={arc(C, C, R, angle(i) + gap / 2, angle(i + 1) - gap / 2)}
               stroke={OBDOBI[d.faze].barva} strokeWidth={W} fill="none" strokeLinecap="butt"
               opacity={d.date <= dny[denDnes - 1]?.date ? 1 : 0.55} />
@@ -109,6 +113,7 @@ function Horizont({ dny }: { dny: Den[] }) {
                 backgroundImage: d.pravdepodobnost === 'vyssi'
                   ? `repeating-linear-gradient(45deg, transparent 0 3px, ${INK}55 3px 4px)` : undefined,
                 outline: jeDnes ? `2px solid ${INK}` : undefined, outlineOffset: 1,
+                boxShadow: d.faze === 'menstruace' ? `inset 0 0 0 1.5px ${INK}` : undefined,
               }} />
             </div>
           )
