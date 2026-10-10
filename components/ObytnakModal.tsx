@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { createPortal } from 'react-dom'
 import { createClient } from '@/lib/supabase'
-import { KAMPANE, OSOBA, type Kampan, type Person, type Vlastnik, type Dostupnost, type Sdileni, type ZdrojRow, type VkladRow } from '@/lib/obytnak'
+import { KAMPANE, OSOBA, tisice, type Kampan, type Person, type Vlastnik, type Dostupnost, type Sdileni, type ZdrojRow, type VkladRow } from '@/lib/obytnak'
 
 const INK = 'hsl(25 30% 15%)'
 const INPUT: React.CSSProperties = {
@@ -11,6 +11,10 @@ const INPUT: React.CSSProperties = {
   padding: '10px 12px', fontFamily: 'var(--font-notes)', fontSize: '0.95rem',
   color: INK, outline: 'none', width: '100%',
 }
+
+// vstup částky: zobrazuje se s mezerami po tisících, ukládá se číslo
+function formatCastka(v: string) { const d = v.replace(/[^\d]/g, ''); return d ? tisice(Number(d)) : '' }
+function parseCastka(v: string) { const d = v.replace(/[^\d]/g, ''); return d ? Number(d) : NaN }
 
 function Label({ children }: { children: React.ReactNode }) {
   return <label className="font-notes text-xs uppercase tracking-widest" style={{ color: 'hsl(25 15% 55%)' }}>{children}</label>
@@ -79,13 +83,13 @@ export function ZdrojModal({ init, me, userId, onClose, onSaved }: {
   const z = init.zdroj
   const [nazev, setNazev] = useState(z?.nazev ?? '')
   const [kampan, setKampan] = useState<Kampan>(z?.kampan ?? init.kampan)
-  const [cil, setCil] = useState(z ? String(z.cilova_castka) : '')
+  const [cil, setCil] = useState(z ? formatCastka(String(Math.round(Number(z.cilova_castka)))) : '')
   const [person, setPerson] = useState<Vlastnik>(z?.person ?? me)
   const sdileni: Sdileni = 'spolecny' // vždy vidí oba (rozhodnuto 10. 10. 2026)
   const [note, setNote] = useState(z?.note ?? '')
   const [saving, setSaving] = useState(false)
 
-  const cilNum = parseFloat(cil.replace(/\s/g, '').replace(',', '.'))
+  const cilNum = parseCastka(cil)
   const valid = nazev.trim().length > 0 && Number.isFinite(cilNum) && cilNum >= 0
 
   const save = async () => {
@@ -113,7 +117,7 @@ export function ZdrojModal({ init, me, userId, onClose, onSaved }: {
       </div>
       <div className="flex flex-col gap-1">
         <Label>Kolik z něj má být (Kč)</Label>
-        <input value={cil} onChange={e => setCil(e.target.value)} inputMode="numeric" placeholder="100000" style={INPUT} />
+        <input value={cil} onChange={e => setCil(formatCastka(e.target.value))} inputMode="numeric" placeholder="100 000" style={INPUT} />
       </div>
       <div className="flex flex-col gap-1">
         <Label>Čí zdroj to je</Label>
@@ -135,14 +139,14 @@ export function VkladModal({ init, me, userId, onClose, onSaved }: {
   const supabase = createClient()
   const v = init.vklad
   const today = new Date(); const dnes = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`
-  const [castka, setCastka] = useState(v ? String(v.castka) : '')
+  const [castka, setCastka] = useState(v ? formatCastka(String(Math.round(Number(v.castka)))) : '')
   const [person, setPerson] = useState<Vlastnik>(v?.person ?? me)
   const [dostupnost, setDostupnost] = useState<Dostupnost>(v?.dostupnost ?? 'k_dispozici')
   const [datum, setDatum] = useState(v?.datum ?? dnes)
   const [note, setNote] = useState(v?.note ?? '')
   const [saving, setSaving] = useState(false)
 
-  const castkaNum = parseFloat(castka.replace(/\s/g, '').replace(',', '.'))
+  const castkaNum = parseCastka(castka)
   const valid = Number.isFinite(castkaNum) && castkaNum > 0 && !!datum
 
   const save = async () => {
@@ -162,7 +166,7 @@ export function VkladModal({ init, me, userId, onClose, onSaved }: {
     <Obal titul={v ? 'Upravit vklad' : `Vklad do „${init.zdroj.nazev}“`} onClose={onClose}>
       <div className="flex flex-col gap-1">
         <Label>Částka (Kč)</Label>
-        <input value={castka} onChange={e => setCastka(e.target.value)} inputMode="numeric" placeholder="5000" style={INPUT} autoFocus />
+        <input value={castka} onChange={e => setCastka(formatCastka(e.target.value))} inputMode="numeric" placeholder="5 000" style={INPUT} autoFocus />
       </div>
       <div className="flex flex-col gap-1">
         <Label>Kdo vložil</Label>

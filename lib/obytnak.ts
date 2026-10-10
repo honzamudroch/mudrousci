@@ -158,7 +158,7 @@ export function spocitejZdroj(zdroj: ZdrojRow, vklady: VkladRow[]): ZdrojStav {
 }
 
 export function spocitejKampan(key: Kampan, milniky: MilnikRow[], polozky: PolozkaRow[], zdroje: ZdrojRow[], vklady: VkladRow[]): KampanStav {
-  const zs = zdroje.filter(z => z.kampan === key).map(z => spocitejZdroj(z, vklady))
+  const zs = zdroje.filter(z => z.kampan === key).map(z => spocitejZdroj(z, vklady)).sort((a, b) => b.nasetreno - a.nasetreno)
   const nasetreno = zs.reduce((a, z) => a + z.nasetreno, 0)
 
   let kum = 0
@@ -216,14 +216,19 @@ export function spocitejVse(milniky: MilnikRow[], polozky: PolozkaRow[], zdroje:
 }
 
 // ── Formátování ───────────────────────────────────────────
+// tisíce vždy oddělené mezerou (nezávisle na locale prohlížeče): 500 000 Kč
+export function tisice(n: number): string {
+  const z = Math.round(Math.abs(n)).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ')
+  return (n < 0 ? '-' : '') + z
+}
 export function kc(n: number): string {
-  return Math.round(n).toLocaleString('cs-CZ') + ' Kč'
+  return tisice(n) + ' Kč'
 }
 export function kcKratce(n: number): string {
   const a = Math.abs(n)
   if (a >= 1_000_000) return (n / 1_000_000).toLocaleString('cs-CZ', { maximumFractionDigits: 2 }) + ' mil.'
-  if (a >= 1000) return Math.round(n / 1000).toLocaleString('cs-CZ') + ' tis.'
-  return Math.round(n).toLocaleString('cs-CZ')
+  if (a >= 1000) return tisice(n / 1000) + ' tis.'
+  return tisice(n)
 }
 export const OSOBA: Record<Vlastnik, { label: string; emoji: string }> = {
   honza: { label: 'Honza', emoji: '🧔' },
