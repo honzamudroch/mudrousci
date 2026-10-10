@@ -25,7 +25,7 @@ function arc(cx: number, cy: number, r: number, a0: number, a1: number) {
   return `M ${x0.toFixed(2)} ${y0.toFixed(2)} A ${r} ${r} 0 ${a1 - a0 > 180 ? 1 : 0} 1 ${x1.toFixed(2)} ${y1.toFixed(2)}`
 }
 
-function Kolo({ dny, denDnes, faze, obdobi }: { dny: Den[]; denDnes: number; faze: Faze; obdobi: string }) {
+function Kolo({ dny, denDnes, faze }: { dny: Den[]; denDnes: number; faze: Faze }) {
   const S = 320, C = 160, R = 118, W = 26
   const n = Math.max(dny.length, 1)
   const seg = 360 / n, gap = Math.min(1.6, seg * 0.18)
@@ -66,7 +66,7 @@ function Kolo({ dny, denDnes, faze, obdobi }: { dny: Den[]; denDnes: number; faz
         Den {denDnes}
       </text>
       <text x={C} y={C + 22} textAnchor="middle" fontFamily="var(--font-notes)" fontSize="15" fill={MUTED}>
-        {OBDOBI[faze].label} · {OBDOBI[faze].emoji} {obdobi}
+        {OBDOBI[faze].label}
       </text>
     </svg>
   )
@@ -138,7 +138,7 @@ function Pruvodce({ aktualni }: { aktualni: Faze | null }) {
           <div key={f} className="paper-card rounded-2xl" style={{ border: '1px solid #e0dbd4', transform: `rotate(${idx % 2 ? 0.5 : -0.5}deg)` }}>
             <button onClick={() => setOpen(je ? null : f)} className="w-full flex items-center gap-3 px-5 py-4 text-left">
               <span style={{ width: 12, height: 12, borderRadius: 6, background: o.barva, flexShrink: 0 }} />
-              <span className="font-hand" style={{ fontSize: '1.5rem', color: INK }}>{o.label} · {o.emoji} {o.obdobi}</span>
+              <span className="font-hand" style={{ fontSize: '1.5rem', color: INK }}>{o.label}</span>
               <span className="font-notes text-xs" style={{ color: MUTED, marginLeft: 'auto' }}>{DNY[f]} {je ? '▾' : '▸'}</span>
             </button>
             {je && (
@@ -246,13 +246,13 @@ export default function CyklusPage() {
             )}
             <div className="flex flex-col md:grid md:grid-cols-[1fr_auto_1fr] md:items-center gap-5">
               <div className="order-first md:order-none justify-self-center">
-                <Kolo dny={koloDny} denDnes={m.denCyklu} faze={m.faze} obdobi={OBDOBI[m.faze].obdobi} />
+                <Kolo dny={koloDny} denDnes={m.denCyklu} faze={m.faze} />
               </div>
 
               <div className="flex flex-col gap-4 md:-order-1">
                 <Stitek rot={-1.2} barva={OBDOBI[m.faze].barva} nadpis="Fáze"
                   hodnota={OBDOBI[m.faze].label}
-                  pozn={`${OBDOBI[m.faze].emoji} ${OBDOBI[m.faze].obdobi}, ${m.denCyklu}. den z přibližně ${m.prumernaDelka}`} />
+                  pozn={`${m.denCyklu}. den z přibližně ${m.prumernaDelka}`} />
                 {m.dniDoMenstruace !== null && m.dalsiZacatek && (
                   <Stitek rot={0.8} barva={OBDOBI.menstruace.barva} nadpis="Další menstruace"
                     hodnota={m.dniDoMenstruace === 0 ? 'dnes' : `za ${m.dniDoMenstruace} ${m.dniDoMenstruace === 1 ? 'den' : m.dniDoMenstruace < 5 ? 'dny' : 'dní'}`}
