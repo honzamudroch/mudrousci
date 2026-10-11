@@ -85,8 +85,8 @@ function Horizont({ dny }: { dny: Den[] }) {
   const opac = (k: number) => k === 0 ? 1 : k === 1 ? 0.7 : 0.45
 
   return (
-    <div style={{ overflowX: 'auto', paddingBottom: 8 }}>
-      <div style={{ position: 'relative', width: dny.length * W, height: TOP + H + 4 }}>
+    <div style={{ overflowX: 'auto', paddingBottom: 8, paddingLeft: 4, paddingTop: 2 }}>
+      <div style={{ position: 'relative', width: dny.length * W + 4, height: TOP + H + 4 }}>
         {mesice.map(m => (
           <div key={m.x}>
             {/* svislá dělicí čára přes celý pás na přelomu měsíce */}
