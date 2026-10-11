@@ -28,7 +28,7 @@ function Kopretina({ size = 16 }: { size?: number }) {
   return <svg width={size} height={size} viewBox="0 0 24 24" aria-hidden><KopretinaTvar /></svg>
 }
 function Vykricnik({ size = 14 }: { size?: number }) {
-  return <span className="font-notes" style={{ fontSize: size, lineHeight: 1, fontWeight: 700, color: INK }}>!</span>
+  return <span className="font-notes" style={{ fontSize: size, lineHeight: 1, fontWeight: 700, color: INK, opacity: 0.7 }}>!</span>
 }
 
 // ── Kolo ──────────────────────────────────────────────────
@@ -71,7 +71,7 @@ function Kolo({ dny, denDnes, faze }: { dny: Den[]; denDnes: number; faze: Faze 
               const [mx, my] = polar(C, C, R, angle(i) + seg / 2)
               if (d.faze === 'menstruace') return <use href="#kopretina" x={mx - 8} y={my - 8} width="16" height="16" />
               if (d.pravdepodobnost === 'vyssi') return (
-                <text x={mx} y={my} textAnchor="middle" dominantBaseline="central" fontFamily="var(--font-notes)" fontSize="15" fontWeight="700" fill={INK}>!</text>
+                <text x={mx} y={my} textAnchor="middle" dominantBaseline="central" fontFamily="var(--font-notes)" fontSize="11" fontWeight="700" fill={INK} opacity="0.7">!</text>
               )
               return null
             })()}
@@ -133,7 +133,7 @@ function Horizont({ dny }: { dny: Den[] }) {
               }}>
                 {(d.faze === 'menstruace' || d.pravdepodobnost === 'vyssi') && (
                   <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    {d.faze === 'menstruace' ? <Kopretina size={15} /> : <Vykricnik size={15} />}
+                    {d.faze === 'menstruace' ? <Kopretina size={15} /> : <Vykricnik size={11} />}
                   </div>
                 )}
               </div>
@@ -318,7 +318,7 @@ export default function CyklusPage() {
               <div className="flex gap-3 flex-wrap font-notes text-xs" style={{ color: MUTED }}>
                 {FAZE_PORADI.map(f => <span key={f} className="flex items-center gap-1"><span style={{ width: 12, height: 12, background: OBDOBI[f].barva, borderRadius: 2 }} />{OBDOBI[f].label}</span>)}
                 <span className="flex items-center gap-1"><Kopretina size={14} /> menstruace</span>
-                <span className="flex items-center gap-1"><Vykricnik size={14} /> plodné dny</span>
+                <span className="flex items-center gap-1"><Vykricnik size={11} /> plodné dny</span>
               </div>
             </section>
 
