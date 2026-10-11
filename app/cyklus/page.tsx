@@ -13,6 +13,9 @@ const INK = 'hsl(25 30% 15%)'
 const MUTED = 'hsl(25 15% 45%)'
 
 function cz(s: string) { const [, m, d] = s.split('-'); return `${+d}. ${+m}.` }
+// vzory v kalendáři a legendě: menstruace = tečky, plodné okno = šrafy
+const VZOR_TECKY = `radial-gradient(circle, ${INK} 1.3px, transparent 1.6px)`
+const VZOR_SRAFY = `repeating-linear-gradient(45deg, transparent 0 3px, ${INK}aa 3px 5px)`
 
 // ── Kolo ──────────────────────────────────────────────────
 function polar(cx: number, cy: number, r: number, deg: number): [number, number] {
@@ -39,7 +42,10 @@ function Kolo({ dny, denDnes, faze }: { dny: Den[]; denDnes: number; faze: Faze 
           <feDisplacementMap in="SourceGraphic" in2="n" scale="1.8" xChannelSelector="R" yChannelSelector="G" />
         </filter>
         <pattern id="srafy" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
-          <line x1="0" y1="0" x2="0" y2="6" stroke={INK} strokeWidth="1.4" opacity="0.35" />
+          <line x1="0" y1="0" x2="0" y2="6" stroke={INK} strokeWidth="1.6" opacity="0.6" />
+        </pattern>
+        <pattern id="tecky" width="6" height="6" patternUnits="userSpaceOnUse">
+          <circle cx="3" cy="3" r="1.3" fill={INK} opacity="0.75" />
         </pattern>
       </defs>
       <g filter="url(#ink)">
@@ -55,6 +61,10 @@ function Kolo({ dny, denDnes, faze }: { dny: Den[]; denDnes: number; faze: Faze 
             {d.pravdepodobnost === 'vyssi' && (
               <path d={arc(C, C, R, angle(i) + gap / 2, angle(i + 1) - gap / 2)}
                 stroke="url(#srafy)" strokeWidth={W} fill="none" />
+            )}
+            {d.faze === 'menstruace' && (
+              <path d={arc(C, C, R, angle(i) + gap / 2, angle(i + 1) - gap / 2)}
+                stroke="url(#tecky)" strokeWidth={W} fill="none" />
             )}
           </g>
         ))}
@@ -108,13 +118,14 @@ function Horizont({ dny }: { dny: Den[] }) {
               }}>{+d.date.slice(8)}</span>
               <span className="font-notes" style={{ fontSize: '0.6rem', lineHeight: '14px', color: MUTED }}>{CS_DNY[dow]}</span>
               <div style={{
-                width: W - 3, height: H, marginTop: 2, borderRadius: 3,
+                width: W - 3, height: H, marginTop: 2, borderRadius: 3, position: 'relative', overflow: 'hidden',
                 background: OBDOBI[d.faze].barva, opacity: opac(d.k),
-                backgroundImage: d.pravdepodobnost === 'vyssi'
-                  ? `repeating-linear-gradient(45deg, transparent 0 3px, ${INK}55 3px 4px)` : undefined,
                 outline: jeDnes ? `2px solid ${INK}` : undefined, outlineOffset: 1,
                 boxShadow: d.faze === 'menstruace' ? `inset 0 0 0 1.5px ${INK}` : undefined,
-              }} />
+              }}>
+                {d.pravdepodobnost === 'vyssi' && <div style={{ position: 'absolute', inset: 0, backgroundImage: VZOR_SRAFY }} />}
+                {d.faze === 'menstruace' && <div style={{ position: 'absolute', inset: 0, backgroundImage: VZOR_TECKY, backgroundSize: '6px 6px', backgroundPosition: '1px 1px' }} />}
+              </div>
             </div>
           )
         })}
@@ -294,8 +305,8 @@ export default function CyklusPage() {
               <h2 className="font-hand" style={{ fontSize: '1.7rem', color: INK }}>Další 3 měsíce</h2>
               <Horizont dny={m.horizont(92)} />
               <div className="flex gap-3 flex-wrap font-notes text-xs" style={{ color: MUTED }}>
-                {FAZE_PORADI.map(f => <span key={f} className="flex items-center gap-1"><span style={{ width: 10, height: 10, background: OBDOBI[f].barva, borderRadius: 2 }} />{OBDOBI[f].label}</span>)}
-                <span className="flex items-center gap-1"><span style={{ width: 10, height: 10, background: `repeating-linear-gradient(45deg, #ddd 0 2px, ${INK} 2px 3px)`, borderRadius: 2 }} />plodné okno</span>
+                {FAZE_PORADI.map(f => <span key={f} className="flex items-center gap-1"><span style={{ width: 12, height: 12, background: OBDOBI[f].barva, borderRadius: 2, boxShadow: f === 'menstruace' ? `inset 0 0 0 1px ${INK}` : undefined, backgroundImage: f === 'menstruace' ? VZOR_TECKY : undefined, backgroundSize: '4px 4px' }} />{OBDOBI[f].label}</span>)}
+                <span className="flex items-center gap-1"><span style={{ width: 12, height: 12, background: OBDOBI.ovulace.barva, backgroundImage: VZOR_SRAFY, borderRadius: 2 }} />plodné okno</span>
               </div>
             </section>
 
