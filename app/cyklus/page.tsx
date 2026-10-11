@@ -13,12 +13,13 @@ const INK = 'hsl(25 30% 15%)'
 const MUTED = 'hsl(25 15% 45%)'
 
 function cz(s: string) { const [, m, d] = s.split('-'); return `${+d}. ${+m}.` }
-// vzor v kalendáři a legendě: menstruace = obrysy kopretin (plodné okno se zatím nekreslí)
+// vzory v kalendáři a legendě: menstruace = obrysy kopretin, plodné okno = šrafy
 const KOPRETINA_SVG = (() => {
   const okvetni = [0, 60, 120, 180, 240, 300].map(a => `<ellipse cx='5' cy='2.2' rx='1' ry='1.8' transform='rotate(${a} 5 5)'/>`).join('')
   return `<svg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10' fill='none' stroke='rgb(50,37,25)' stroke-width='0.55'>${okvetni}<circle cx='5' cy='5' r='0.9'/></svg>`
 })()
 const VZOR_KOPRETINY = `url("data:image/svg+xml;utf8,${encodeURIComponent(KOPRETINA_SVG)}")`
+const VZOR_SRAFY = `repeating-linear-gradient(45deg, transparent 0 3px, ${INK}aa 3px 5px)`
 
 // ── Kolo ──────────────────────────────────────────────────
 function polar(cx: number, cy: number, r: number, deg: number): [number, number] {
@@ -44,6 +45,9 @@ function Kolo({ dny, denDnes, faze }: { dny: Den[]; denDnes: number; faze: Faze 
           <feTurbulence type="fractalNoise" baseFrequency="0.035" numOctaves="2" seed="7" result="n" />
           <feDisplacementMap in="SourceGraphic" in2="n" scale="1.8" xChannelSelector="R" yChannelSelector="G" />
         </filter>
+        <pattern id="srafy" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+          <line x1="0" y1="0" x2="0" y2="6" stroke={INK} strokeWidth="1.6" opacity="0.6" />
+        </pattern>
         <pattern id="kopretiny" width="10" height="10" patternUnits="userSpaceOnUse">
           <g fill="none" stroke={INK} strokeWidth="0.55" opacity="0.85">
             {[0, 60, 120, 180, 240, 300].map(a => <ellipse key={a} cx="5" cy="2.2" rx="1" ry="1.8" transform={`rotate(${a} 5 5)`} />)}
@@ -61,6 +65,10 @@ function Kolo({ dny, denDnes, faze }: { dny: Den[]; denDnes: number; faze: Faze 
             <path d={arc(C, C, R, angle(i) + gap / 2, angle(i + 1) - gap / 2)}
               stroke={OBDOBI[d.faze].barva} strokeWidth={W} fill="none" strokeLinecap="butt"
               opacity={d.date <= dny[denDnes - 1]?.date ? 1 : 0.55} />
+            {d.pravdepodobnost === 'vyssi' && (
+              <path d={arc(C, C, R, angle(i) + gap / 2, angle(i + 1) - gap / 2)}
+                stroke="url(#srafy)" strokeWidth={W} fill="none" />
+            )}
             {d.faze === 'menstruace' && (
               <path d={arc(C, C, R, angle(i) + gap / 2, angle(i + 1) - gap / 2)}
                 stroke="url(#kopretiny)" strokeWidth={W} fill="none" />
@@ -122,6 +130,7 @@ function Horizont({ dny }: { dny: Den[] }) {
                 outline: jeDnes ? `2px solid ${INK}` : undefined, outlineOffset: 1,
                 boxShadow: d.faze === 'menstruace' ? `inset 0 0 0 1.5px ${INK}` : undefined,
               }}>
+                {d.pravdepodobnost === 'vyssi' && <div style={{ position: 'absolute', inset: 0, backgroundImage: VZOR_SRAFY }} />}
                 {d.faze === 'menstruace' && <div style={{ position: 'absolute', inset: 0, backgroundImage: VZOR_KOPRETINY, backgroundSize: '10px 10px', backgroundPosition: 'center' }} />}
               </div>
             </div>
@@ -304,6 +313,7 @@ export default function CyklusPage() {
               <Horizont dny={m.horizont(92)} />
               <div className="flex gap-3 flex-wrap font-notes text-xs" style={{ color: MUTED }}>
                 {FAZE_PORADI.map(f => <span key={f} className="flex items-center gap-1"><span style={{ width: 12, height: 12, background: OBDOBI[f].barva, borderRadius: 2, boxShadow: f === 'menstruace' ? `inset 0 0 0 1px ${INK}` : undefined, backgroundImage: f === 'menstruace' ? VZOR_KOPRETINY : undefined, backgroundSize: '10px 10px', backgroundPosition: 'center' }} />{OBDOBI[f].label}</span>)}
+                <span className="flex items-center gap-1"><span style={{ width: 12, height: 12, background: OBDOBI.ovulace.barva, backgroundImage: VZOR_SRAFY, borderRadius: 2 }} />plodné okno</span>
               </div>
             </section>
 
